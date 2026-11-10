@@ -5,74 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nghịch Thủy Hàn - Thủy Hàn Bang Hội</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Noto+Serif:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        :root {
+            --gold: #d4a64a;
+            --gold-bright: #f0cf7a;
+            --gold-deep: #8a6420;
+            --ink: #0d0a07;
+            --ink-2: #17110a;
+            --ink-3: #221a10;
+            --lacquer: #7a1f16;
+            --text: #efe6d2;
+            --muted: #a8977a;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #060911;
-            color: #e2e8f0;
-            background-image: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #060911 80%);
+            background-color: var(--ink);
+            color: var(--text);
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(212,166,74,0.16) 0%, transparent 55%),
+                radial-gradient(circle at 100% 100%, rgba(122,31,22,0.18) 0%, transparent 45%);
             min-height: 100vh;
         }
-        .cinzel-font { font-family: 'Cinzel', serif; }
-        .justice-border {
-            border: 1px solid rgba(6, 182, 212, 0.3);
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+        .cinzel-font { font-family: 'Cinzel', 'Noto Serif', serif; }
+        .serif-font { font-family: 'Noto Serif', serif; }
+        .gold-text { color: var(--gold); }
+        .gold-glow { color: var(--gold-bright); text-shadow: 0 0 14px rgba(240,207,122,0.45); }
+        .panel {
+            background: linear-gradient(180deg, rgba(34,26,16,0.85), rgba(23,17,10,0.9));
+            border: 1px solid rgba(212,166,74,0.32);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.6) inset, 0 10px 30px rgba(0,0,0,0.45);
         }
-        .justice-glow { text-shadow: 0 0 12px rgba(6, 182, 212, 0.6); }
-        #wheel-canvas { transition: transform 4s cubic-bezier(0.15, 0.9, 0.2, 1); }
+        .panel-soft { background: rgba(23,17,10,0.7); border: 1px solid rgba(212,166,74,0.16); }
+        .btn-gold {
+            background: linear-gradient(180deg, #e7c46a 0%, #b8862f 55%, #8a6420 100%);
+            color: #1a1206; font-weight: 700;
+            border: 1px solid #f0cf7a;
+            box-shadow: 0 4px 14px rgba(212,166,74,0.25), inset 0 1px 0 rgba(255,255,255,0.35);
+            transition: filter .2s, transform .15s;
+            cursor: pointer;
+        }
+        .btn-gold:hover:not(:disabled) { filter: brightness(1.08); }
+        .btn-gold:active:not(:disabled) { transform: translateY(1px); }
+        .btn-gold:disabled { opacity: .45; cursor: not-allowed; }
+        .btn-ghost { background: rgba(13,10,7,0.6); color: var(--gold); border: 1px solid rgba(212,166,74,0.35); transition: background .2s; cursor: pointer; }
+        .btn-ghost:hover { background: rgba(212,166,74,0.1); }
+        .field {
+            width: 100%; background: var(--ink); color: var(--text);
+            border: 1px solid rgba(212,166,74,0.22); border-radius: 0.6rem;
+            padding: 0.6rem 0.9rem; font-size: 0.9rem; transition: border-color .2s;
+        }
+        .field:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,166,74,0.18); }
+        .label { display:block; font-size: .75rem; font-weight: 600; color: var(--muted); margin-bottom: .3rem; letter-spacing: .02em; }
+        .divider { border-color: rgba(212,166,74,0.18); }
+        .tab-btn { cursor: pointer; }
+        button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+        .corner { position: relative; }
+        .corner::before, .corner::after {
+            content: ''; position: absolute; width: 18px; height: 18px; border-color: var(--gold); pointer-events: none;
+        }
+        .corner::before { top: 6px; left: 6px; border-top: 2px solid; border-left: 2px solid; }
+        .corner::after { bottom: 6px; right: 6px; border-bottom: 2px solid; border-right: 2px solid; }
+        #wheel-canvas { transition: transform 5s cubic-bezier(0.12, 0.85, 0.18, 1); }
+        @media (prefers-reduced-motion: reduce) { #wheel-canvas { transition-duration: 1s; } }
+        table thead tr { background: rgba(13,10,7,0.9); color: var(--gold); }
+        tbody tr { border-color: rgba(212,166,74,0.1) !important; }
+        tbody tr:hover { background: rgba(212,166,74,0.05); }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #080c14; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+        ::-webkit-scrollbar-track { background: var(--ink); }
+        ::-webkit-scrollbar-thumb { background: #3a2d18; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold-deep); }
     </style>
 </head>
-<body class="antialiased selection:bg-cyan-500 selection:text-white">
+<body class="antialiased selection:bg-yellow-600 selection:text-black">
 
     <div id="app" class="flex flex-col min-h-screen">
 
         <!-- Header -->
-        <header class="bg-slate-950/90 backdrop-blur border-b border-cyan-500/30 sticky top-0 z-40">
+        <header class="backdrop-blur sticky top-0 z-40" style="background: rgba(13,10,7,0.92); border-bottom: 1px solid rgba(212,166,74,0.35);">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-900 flex items-center justify-center justice-border shadow-lg">
-                        <i class="fa-solid fa-water text-cyan-300 text-xl"></i>
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background: radial-gradient(circle, #3a2a12, #120d07); border: 1px solid var(--gold); box-shadow: 0 0 16px rgba(212,166,74,0.25);">
+                        <i class="fa-solid fa-yin-yang text-xl" style="color: var(--gold-bright);" aria-hidden="true"></i>
                     </div>
                     <div>
-                        <h1 id="header-guild-name" class="cinzel-font text-2xl font-bold tracking-wider text-cyan-400 justice-glow">THỦY HÀN BANG</h1>
-                        <p id="header-guild-slogan" class="text-xs text-slate-400 italic">Nghịch Thủy Hành Giả &bull; Giang Hồ Tương Phùng</p>
+                        <h1 id="header-guild-name" class="cinzel-font text-xl sm:text-2xl font-bold tracking-wider gold-glow">THỦY HÀN BANG</h1>
+                        <p id="header-guild-slogan" class="text-xs italic serif-font" style="color: var(--muted);">Nghịch Thủy Hành Giả &bull; Giang Hồ Tương Phùng</p>
                     </div>
                 </div>
 
                 <nav class="hidden md:flex space-x-1 lg:space-x-2">
-                    <button onclick="switchTab('members')" id="nav-members" class="tab-btn"><i class="fa-solid fa-users-line mr-2"></i> Bang Chúng</button>
-                    <button onclick="switchTab('wheel')" id="nav-wheel" class="tab-btn"><i class="fa-solid fa-dharmachakra mr-2"></i> Vòng Quay Tuần</button>
-                    <button onclick="switchTab('logs')" id="nav-logs" class="tab-btn"><i class="fa-solid fa-book-journal-whills mr-2"></i> Sổ Ban Thưởng</button>
-                    <button onclick="switchTab('settings')" id="nav-settings" class="tab-btn hidden"><i class="fa-solid fa-sliders mr-2"></i> Thiết Lập Bang</button>
+                    <button onclick="switchTab('members')" id="nav-members" class="tab-btn"><i class="fa-solid fa-users-line mr-2" aria-hidden="true"></i> Bang Chúng</button>
+                    <button onclick="switchTab('wheel')" id="nav-wheel" class="tab-btn"><i class="fa-solid fa-dharmachakra mr-2" aria-hidden="true"></i> Vòng Quay</button>
+                    <button onclick="switchTab('logs')" id="nav-logs" class="tab-btn"><i class="fa-solid fa-scroll mr-2" aria-hidden="true"></i> Sổ Ban Thưởng</button>
+                    <button onclick="switchTab('settings')" id="nav-settings" class="tab-btn hidden"><i class="fa-solid fa-sliders mr-2" aria-hidden="true"></i> Thiết Lập Bang</button>
                 </nav>
 
                 <div class="flex items-center space-x-3">
-                    <div class="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800 text-xs">
-                        <span class="w-2.5 h-2.5 rounded-full bg-slate-500" id="status-dot"></span>
-                        <span id="status-text" class="text-slate-300 font-mono">Đang kết nối...</span>
+                    <div class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full text-xs panel-soft">
+                        <span class="w-2.5 h-2.5 rounded-full bg-stone-500" id="status-dot"></span>
+                        <span id="status-text" class="font-mono" style="color: var(--muted);">Đang kết nối...</span>
                     </div>
-                    <button id="admin-btn" onclick="handleAdminClick()" class="hidden sm:flex items-center px-3 py-1.5 rounded-full border border-slate-700 text-xs text-slate-300 hover:border-cyan-500 hover:text-cyan-300 transition">
-                        <i class="fa-solid fa-key mr-2"></i><span id="admin-btn-text">Bang Chủ đăng nhập</span>
+                    <button id="admin-btn" onclick="handleAdminClick()" class="hidden sm:flex items-center px-3 py-1.5 rounded-full text-xs btn-ghost">
+                        <i class="fa-solid fa-key mr-2" aria-hidden="true"></i><span id="admin-btn-text">Bang Chủ đăng nhập</span>
                     </button>
-                    <button onclick="toggleMobileMenu()" class="md:hidden text-slate-300 hover:text-cyan-400 p-2">
-                        <i class="fa-solid fa-bars text-xl"></i>
+                    <button onclick="toggleMobileMenu()" aria-label="Mở menu" class="md:hidden p-2 gold-text">
+                        <i class="fa-solid fa-bars text-xl" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
 
-            <div id="mobile-menu" class="hidden md:hidden bg-slate-950 border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
-                <button onclick="switchTab('members'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-900">Bang Chúng</button>
-                <button onclick="switchTab('wheel'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-900">Vòng Quay Tuần</button>
-                <button onclick="switchTab('logs'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-900">Sổ Ban Thưởng</button>
-                <button id="mobile-nav-settings" onclick="switchTab('settings'); toggleMobileMenu();" class="hidden w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-900">Thiết Lập Bang</button>
-                <button onclick="handleAdminClick(); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm text-cyan-300 hover:bg-slate-900" id="mobile-admin-btn">Bang Chủ đăng nhập</button>
+            <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-4 space-y-2" style="background: var(--ink); border-bottom: 1px solid rgba(212,166,74,0.2);">
+                <button onclick="switchTab('members'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm hover:bg-yellow-900/20">Bang Chúng</button>
+                <button onclick="switchTab('wheel'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm hover:bg-yellow-900/20">Vòng Quay</button>
+                <button onclick="switchTab('logs'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm hover:bg-yellow-900/20">Sổ Ban Thưởng</button>
+                <button id="mobile-nav-settings" onclick="switchTab('settings'); toggleMobileMenu();" class="hidden w-full text-left px-3 py-2.5 rounded-lg text-sm hover:bg-yellow-900/20">Thiết Lập Bang</button>
+                <button onclick="handleAdminClick(); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm gold-text hover:bg-yellow-900/20" id="mobile-admin-btn">Bang Chủ đăng nhập</button>
             </div>
         </header>
 
@@ -80,46 +130,46 @@
 
             <!-- TAB: MEMBERS -->
             <section id="tab-content-members" class="space-y-6">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/60 p-6 rounded-2xl justice-border">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 rounded-xl panel corner">
                     <div>
-                        <h2 class="cinzel-font text-2xl font-bold text-cyan-400 flex items-center">
-                            <i class="fa-solid fa-users mr-3 text-cyan-500"></i> Danh Sách Bang Chúng Nghịch Thủy Hàn
+                        <h2 class="cinzel-font text-2xl font-bold gold-glow flex items-center">
+                            <i class="fa-solid fa-users mr-3" aria-hidden="true"></i> Danh Sách Bang Chúng
                         </h2>
-                        <p class="text-sm text-slate-400 mt-1">Quản lý hiệp khách, môn phái và chức vụ trong bang.</p>
+                        <p class="text-sm mt-1" style="color: var(--muted);">Quản lý hiệp khách, môn phái và chức vụ trong bang.</p>
                     </div>
-                    <button onclick="openAddMemberModal()" class="bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white font-medium px-4 py-2 rounded-xl shadow-lg transition-all duration-200 flex items-center border border-cyan-400/40">
-                        <i class="fa-solid fa-user-plus mr-2"></i> Chiêu Mộ Hiệp Khách
+                    <button onclick="openAddMemberModal()" class="btn-gold px-4 py-2.5 rounded-lg flex items-center text-sm">
+                        <i class="fa-solid fa-user-plus mr-2" aria-hidden="true"></i> Chiêu Mộ Hiệp Khách
                     </button>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-900/40 p-4 rounded-xl border border-slate-800">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 rounded-xl panel-soft">
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Tìm kiếm hiệp khách</label>
+                        <label class="label" for="search-member">Tìm kiếm hiệp khách</label>
                         <div class="relative">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-sm"></i>
-                            <input type="text" id="search-member" oninput="renderMembersTable()" placeholder="Tên nhân vật hoặc ID game..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-sm" style="color: var(--muted);" aria-hidden="true"></i>
+                            <input type="text" id="search-member" oninput="renderMembersTable()" placeholder="Tên nhân vật hoặc ID game..." class="field" style="padding-left: 2.4rem;">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Môn Phái</label>
-                        <select id="filter-faction" onchange="renderMembersTable()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+                        <label class="label" for="filter-faction">Môn Phái</label>
+                        <select id="filter-faction" onchange="renderMembersTable()" class="field">
                             <option value="">Tất cả môn phái</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1">Sắp xếp</label>
-                        <select id="sort-members" onchange="renderMembersTable()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+                        <label class="label" for="sort-members">Sắp xếp</label>
+                        <select id="sort-members" onchange="renderMembersTable()" class="field">
                             <option value="role">Chức vị</option>
                             <option value="name-asc">Tên: A - Z</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="bg-slate-900/80 rounded-2xl justice-border overflow-hidden shadow-xl">
+                <div class="rounded-xl overflow-hidden panel">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-slate-950/90 text-cyan-400 text-xs cinzel-font tracking-wider border-b border-slate-800">
+                                <tr class="text-xs cinzel-font tracking-wider">
                                     <th class="p-4">Hiệp Khách & ID</th>
                                     <th class="p-4">Môn Phái</th>
                                     <th class="p-4">Chức Vị</th>
@@ -127,8 +177,8 @@
                                     <th class="p-4 text-center">Thao Tác</th>
                                 </tr>
                             </thead>
-                            <tbody id="members-table-body" class="divide-y divide-slate-800/80 text-sm">
-                                <tr><td colspan="5" class="text-center py-8 text-slate-500">Đang tải danh sách bang chúng...</td></tr>
+                            <tbody id="members-table-body" class="divide-y text-sm">
+                                <tr><td colspan="5" class="text-center py-8" style="color: var(--muted);">Đang tải danh sách bang chúng...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -137,46 +187,50 @@
 
             <!-- TAB: WHEEL -->
             <section id="tab-content-wheel" class="hidden space-y-6">
-                <div class="bg-slate-900/60 p-6 rounded-2xl justice-border text-center relative overflow-hidden">
-                    <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl text-cyan-500"><i class="fa-solid fa-dharmachakra"></i></div>
-                    <h2 class="cinzel-font text-3xl font-bold text-cyan-400 justice-glow mb-2">Vòng Quay Thiên Mệnh Thủy Hàn</h2>
-                    <p class="text-sm text-slate-400 max-w-2xl mx-auto">Mỗi anh tài chỉ được quay 1 lần mỗi tuần để nhận bảo vật hiếm từ bang hội. Vận may giang hồ vẫy gọi!</p>
+                <div class="p-6 rounded-xl text-center relative overflow-hidden panel corner">
+                    <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl gold-text" aria-hidden="true"><i class="fa-solid fa-dharmachakra"></i></div>
+                    <h2 class="cinzel-font text-2xl sm:text-3xl font-bold gold-glow mb-2">Vòng Quay Thiên Mệnh</h2>
+                    <p class="text-sm max-w-2xl mx-auto serif-font" style="color: var(--muted);">Toàn bộ bang chúng đang hoạt động đều có tên trên vòng quay. Kim chỉ dừng ở ai, người đó là kẻ được trời chọn.</p>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                    <div class="lg:col-span-1 bg-slate-900/80 p-6 rounded-2xl justice-border space-y-6">
-                        <h3 class="cinzel-font text-xl font-bold text-cyan-400 border-b border-slate-800 pb-3">Chọn Hiệp Khách Quay Thưởng</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-400 mb-1">Chọn Thành Viên</label>
-                                <select id="wheel-member-select" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500">
-                                    <option value="">-- Chọn hiệp khách --</option>
-                                </select>
-                            </div>
-                            <div id="wheel-member-status-box" class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-xs space-y-2 hidden">
-                                <div class="flex justify-between"><span class="text-slate-400">Môn phái:</span> <span id="w-status-faction" class="font-medium text-white">-</span></div>
-                                <div class="flex justify-between"><span class="text-slate-400">Chức vị:</span> <span id="w-status-role" class="font-medium text-white">-</span></div>
-                                <div class="flex justify-between"><span class="text-slate-400">Trạng thái tuần:</span> <span id="w-status-spun" class="font-medium text-cyan-400">-</span></div>
-                            </div>
-                            <button id="spin-btn" onclick="spinWheel()" disabled class="w-full py-4 rounded-xl font-bold cinzel-font tracking-wider bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-cyan-400/40">
-                                <i class="fa-solid fa-dharmachakra mr-2"></i> KÍCH HOẠT VÒNG QUAY
-                            </button>
+                    <div class="lg:col-span-1 p-6 rounded-xl panel space-y-5">
+                        <h3 class="cinzel-font text-lg font-bold gold-text border-b divider pb-3">Thiết Lập Lượt Quay</h3>
+
+                        <div>
+                            <label class="label" for="wheel-prize">Phần thưởng lượt này</label>
+                            <input type="text" id="wheel-prize" class="field" placeholder="VD: Giao Long Phục Ba" maxlength="80">
                         </div>
+
+                        <label class="flex items-start gap-3 text-sm cursor-pointer">
+                            <input type="checkbox" id="wheel-exclude-winners" checked onchange="drawWheelCanvas()" class="mt-1 w-4 h-4 accent-yellow-600">
+                            <span>Loại người đã trúng trong tuần này<br><span class="text-xs" style="color: var(--muted);">Mỗi người chỉ trúng tối đa 1 lần/tuần.</span></span>
+                        </label>
+
+                        <div class="rounded-lg p-4 text-xs space-y-2 panel-soft">
+                            <div class="flex justify-between"><span style="color: var(--muted);">Số tên trên vòng:</span> <span id="wheel-count" class="font-semibold gold-text">0</span></div>
+                            <div class="flex justify-between"><span style="color: var(--muted);">Tuần hiện tại:</span> <span id="wheel-week" class="font-mono">-</span></div>
+                        </div>
+
+                        <button id="spin-btn" onclick="spinWheel()" class="btn-gold w-full py-4 rounded-lg cinzel-font tracking-wider">
+                            <i class="fa-solid fa-dharmachakra mr-2" aria-hidden="true"></i> KHAI VẬN VÒNG QUAY
+                        </button>
                     </div>
 
-                    <div class="lg:col-span-2 bg-slate-900/80 p-8 rounded-2xl justice-border flex flex-col items-center justify-center relative min-h-[420px]">
-                        <div class="absolute top-4 z-20 text-cyan-400 text-4xl filter drop-shadow-[0_2px_6px_rgba(6,182,212,0.8)]">
+                    <div class="lg:col-span-2 p-6 sm:p-8 rounded-xl panel flex flex-col items-center justify-center relative min-h-[440px]">
+                        <div class="absolute top-3 z-20 text-5xl" style="color: var(--gold-bright); filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8));" aria-hidden="true">
                             <i class="fa-solid fa-caret-down"></i>
                         </div>
-                        <div class="relative w-80 h-80 sm:w-96 sm:h-96 my-4">
-                            <canvas id="wheel-canvas" width="400" height="400" class="w-full h-full rounded-full shadow-2xl border-4 border-cyan-600/60"></canvas>
-                            <div class="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-cyan-600 to-blue-900 border-4 border-slate-950 shadow-xl flex items-center justify-center z-10">
-                                <i class="fa-solid fa-water text-white text-xl"></i>
+                        <div class="relative w-72 h-72 sm:w-96 sm:h-96 my-6">
+                            <div class="absolute -inset-3 rounded-full" style="background: conic-gradient(from 0deg, #8a6420, #f0cf7a, #8a6420, #f0cf7a, #8a6420); box-shadow: 0 0 40px rgba(212,166,74,0.3);"></div>
+                            <canvas id="wheel-canvas" width="800" height="800" class="relative w-full h-full rounded-full" style="background: var(--ink);"></canvas>
+                            <div class="absolute inset-0 m-auto w-16 h-16 rounded-full flex items-center justify-center z-10" style="background: radial-gradient(circle at 35% 30%, #f0cf7a, #8a6420); border: 3px solid #1a1206; box-shadow: 0 4px 14px rgba(0,0,0,0.6);">
+                                <i class="fa-solid fa-yin-yang text-2xl" style="color: #1a1206;" aria-hidden="true"></i>
                             </div>
                         </div>
-                        <div id="spin-result-box" class="hidden mt-6 text-center bg-cyan-950/40 border border-cyan-500/50 p-4 rounded-xl w-full max-w-md">
-                            <p class="text-xs text-cyan-300 font-medium uppercase tracking-wider">Thiên Mệnh Đã Định</p>
-                            <h4 id="spin-result-text" class="cinzel-font text-xl font-bold text-cyan-100 mt-1"></h4>
+                        <div id="spin-result-box" class="hidden mt-4 text-center p-4 rounded-lg w-full max-w-md" style="background: rgba(122,31,22,0.25); border: 1px solid var(--gold);" role="status" aria-live="polite">
+                            <p class="text-xs font-semibold uppercase tracking-widest gold-text">Thiên Mệnh Đã Định</p>
+                            <h4 id="spin-result-text" class="cinzel-font text-xl font-bold mt-1 gold-glow"></h4>
                         </div>
                     </div>
                 </div>
@@ -184,33 +238,33 @@
 
             <!-- TAB: LOGS -->
             <section id="tab-content-logs" class="hidden space-y-6">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/60 p-6 rounded-2xl justice-border">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 rounded-xl panel corner">
                     <div>
-                        <h2 class="cinzel-font text-2xl font-bold text-cyan-400 flex items-center">
-                            <i class="fa-solid fa-book-journal-whills mr-3 text-cyan-500"></i> Sổ Ban Thưởng Giang Hồ
+                        <h2 class="cinzel-font text-2xl font-bold gold-glow flex items-center">
+                            <i class="fa-solid fa-scroll mr-3" aria-hidden="true"></i> Sổ Ban Thưởng Giang Hồ
                         </h2>
-                        <p class="text-sm text-slate-400 mt-1">Lịch sử ghi nhận toàn bộ bảo vật đã phân phát qua từng tuần.</p>
+                        <p class="text-sm mt-1" style="color: var(--muted);">Lịch sử những người được vòng quay chọn qua từng tuần.</p>
                     </div>
-                    <button onclick="loadSpinLogs()" class="bg-slate-900 hover:bg-slate-800 text-cyan-400 border border-cyan-500/30 px-4 py-2 rounded-xl text-sm font-medium transition flex items-center">
-                        <i class="fa-solid fa-rotate mr-2"></i> Làm Mới Sổ
+                    <button onclick="loadSpinLogs()" class="btn-ghost px-4 py-2 rounded-lg text-sm font-medium flex items-center">
+                        <i class="fa-solid fa-rotate mr-2" aria-hidden="true"></i> Làm Mới Sổ
                     </button>
                 </div>
 
-                <div class="bg-slate-900/80 rounded-2xl justice-border overflow-hidden shadow-xl">
+                <div class="rounded-xl overflow-hidden panel">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-slate-950/90 text-cyan-400 text-xs cinzel-font tracking-wider border-b border-slate-800">
+                                <tr class="text-xs cinzel-font tracking-wider">
                                     <th class="p-4">Tuần (Bắt đầu)</th>
                                     <th class="p-4">Hiệp Khách</th>
-                                    <th class="p-4">Bảo Vật Nhận Được</th>
+                                    <th class="p-4">Phần Thưởng</th>
                                     <th class="p-4">Thời Gian Quay</th>
-                                    <th class="p-4 text-center">Trạng Thái Trao Quà</th>
+                                    <th class="p-4 text-center">Trạng Thái Trao</th>
                                     <th class="p-4 text-center">Thao Tác</th>
                                 </tr>
                             </thead>
-                            <tbody id="logs-table-body" class="divide-y divide-slate-800/80 text-sm">
-                                <tr><td colspan="6" class="text-center py-8 text-slate-500">Đang tải sổ ban thưởng...</td></tr>
+                            <tbody id="logs-table-body" class="divide-y text-sm">
+                                <tr><td colspan="6" class="text-center py-8" style="color: var(--muted);">Đang tải sổ ban thưởng...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -219,26 +273,26 @@
 
             <!-- TAB: SETTINGS (chỉ Bang Chủ) -->
             <section id="tab-content-settings" class="hidden space-y-6 max-w-3xl mx-auto">
-                <div class="bg-slate-900/60 p-6 rounded-2xl justice-border">
-                    <h2 class="cinzel-font text-2xl font-bold text-cyan-400 flex items-center mb-2">
-                        <i class="fa-solid fa-sliders mr-3 text-cyan-500"></i> Thiết Lập Bang Hội
+                <div class="p-6 rounded-xl panel corner">
+                    <h2 class="cinzel-font text-2xl font-bold gold-glow flex items-center mb-2">
+                        <i class="fa-solid fa-sliders mr-3" aria-hidden="true"></i> Thiết Lập Bang Hội
                     </h2>
-                    <p class="text-sm text-slate-400">Đổi tên và khẩu hiệu hiển thị của bang hội.</p>
+                    <p class="text-sm" style="color: var(--muted);">Đổi tên và khẩu hiệu hiển thị của bang hội.</p>
                 </div>
-                <div class="bg-slate-900/80 p-8 rounded-2xl justice-border space-y-6 shadow-xl">
+                <div class="p-8 rounded-xl panel space-y-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">Tên Bang Hội</label>
-                            <input type="text" id="setting-guild-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500" value="Thủy Hàn Bang">
+                            <label class="label" for="setting-guild-name">Tên Bang Hội</label>
+                            <input type="text" id="setting-guild-name" class="field" value="Thủy Hàn Bang">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">Khẩu Hiệu</label>
-                            <input type="text" id="setting-guild-slogan" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500" value="Nghịch Thủy Hành Giả • Giang Hồ Tương Phùng">
+                            <label class="label" for="setting-guild-slogan">Khẩu Hiệu</label>
+                            <input type="text" id="setting-guild-slogan" class="field" value="Nghịch Thủy Hành Giả • Giang Hồ Tương Phùng">
                         </div>
                     </div>
-                    <div class="flex justify-end pt-4 border-t border-slate-800">
-                        <button onclick="saveGuildConfig()" class="bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 text-white font-medium px-6 py-2.5 rounded-xl shadow-lg transition flex items-center">
-                            <i class="fa-solid fa-floppy-disk mr-2"></i> Lưu Thiết Lập
+                    <div class="flex justify-end pt-4 border-t divider">
+                        <button onclick="saveGuildConfig()" class="btn-gold px-6 py-2.5 rounded-lg flex items-center text-sm">
+                            <i class="fa-solid fa-floppy-disk mr-2" aria-hidden="true"></i> Lưu Thiết Lập
                         </button>
                     </div>
                 </div>
@@ -246,8 +300,8 @@
 
         </main>
 
-        <footer class="bg-slate-950/90 border-t border-slate-900 py-6 mt-12 text-center text-xs text-slate-500">
-            <p>Nghịch Thủy Hàn &bull; Thủy Hàn Bang Hội Official</p>
+        <footer class="py-6 mt-12 text-center text-xs serif-font" style="background: rgba(13,10,7,0.92); border-top: 1px solid rgba(212,166,74,0.2); color: var(--muted);">
+            <p>Nghịch Thủy Hàn &bull; Thủy Hàn Bang Hội</p>
         </footer>
     </div>
 
@@ -255,53 +309,53 @@
 
     <!-- Member Modal -->
     <div id="member-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
-        <div class="bg-slate-950 border border-cyan-500/50 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-6 mx-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-                <h3 id="member-modal-title" class="cinzel-font text-xl font-bold text-cyan-400">Chiêu Mộ Hiệp Khách</h3>
-                <button onclick="closeModal('member-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <div class="w-full max-w-lg rounded-xl p-6 space-y-6 mx-4 panel corner" style="background: var(--ink-2);">
+            <div class="flex justify-between items-center border-b divider pb-4">
+                <h3 id="member-modal-title" class="cinzel-font text-xl font-bold gold-glow">Chiêu Mộ Hiệp Khách</h3>
+                <button onclick="closeModal('member-modal')" aria-label="Đóng" class="p-2" style="color: var(--muted);"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <form id="member-form" onsubmit="handleMemberSubmit(event)" class="space-y-4">
                 <input type="hidden" id="member-edit-id">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Tên Hiệp Khách *</label>
-                        <input type="text" id="member-username" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" placeholder="VD: Vô Tình">
+                        <label class="label" for="member-username">Tên Hiệp Khách *</label>
+                        <input type="text" id="member-username" required class="field" placeholder="VD: Vô Tình">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">ID Game</label>
-                        <input type="text" id="member-game-id" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" placeholder="VD: NTH-888">
+                        <label class="label" for="member-game-id">ID Game</label>
+                        <input type="text" id="member-game-id" class="field" placeholder="VD: NTH-888">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Môn Phái</label>
-                        <select id="member-faction" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"></select>
+                        <label class="label" for="member-faction">Môn Phái</label>
+                        <select id="member-faction" class="field"></select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Chức Vị</label>
-                        <select id="member-role" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                            <option value="member">Bang Chúng</option>
-                            <option value="elder">Trưởng Lão</option>
-                            <option value="vice_leader">Phó Bang Chủ</option>
-                            <option value="leader">Bang Chủ</option>
+                        <label class="label" for="member-role">Chức Vị</label>
+                        <select id="member-role" class="field">
+                            <option value="member">Học Việc</option>
+                            <option value="elder">Bang Chúng</option>
+                            <option value="vice_leader">Phó đương gia</option>
+                            <option value="leader">Đại đương gia</option>
                         </select>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Trạng Thái</label>
-                    <select id="member-status" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+                    <label class="label" for="member-status">Trạng Thái</label>
+                    <select id="member-status" class="field">
                         <option value="active">Đang hoạt động</option>
                         <option value="inactive">Tạm nghỉ</option>
                         <option value="banned">Trục xuất</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Ghi chú</label>
-                    <textarea id="member-notes" rows="2" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" placeholder="Ghi chú thêm..."></textarea>
+                    <label class="label" for="member-notes">Ghi chú</label>
+                    <textarea id="member-notes" rows="2" class="field" placeholder="Ghi chú thêm..."></textarea>
                 </div>
-                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-800">
-                    <button type="button" onclick="closeModal('member-modal')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-sm font-medium">Hủy</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 text-white text-sm font-medium">Lưu Thông Tin</button>
+                <div class="flex justify-end space-x-3 pt-3 border-t divider">
+                    <button type="button" onclick="closeModal('member-modal')" class="btn-ghost px-4 py-2 rounded-lg text-sm font-medium">Hủy</button>
+                    <button type="submit" class="btn-gold px-5 py-2 rounded-lg text-sm">Lưu Thông Tin</button>
                 </div>
             </form>
         </div>
@@ -309,61 +363,69 @@
 
     <!-- Login Modal -->
     <div id="login-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
-        <div class="bg-slate-950 border border-cyan-500/50 w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-5 mx-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-                <h3 class="cinzel-font text-xl font-bold text-cyan-400">Bang Chủ Đăng Nhập</h3>
-                <button onclick="closeModal('login-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <div class="w-full max-w-sm rounded-xl p-6 space-y-5 mx-4 panel corner" style="background: var(--ink-2);">
+            <div class="flex justify-between items-center border-b divider pb-4">
+                <h3 class="cinzel-font text-xl font-bold gold-glow">Bang Chủ Đăng Nhập</h3>
+                <button onclick="closeModal('login-modal')" aria-label="Đóng" class="p-2" style="color: var(--muted);"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Email</label>
-                    <input type="email" id="login-email" required autocomplete="username" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+                    <label class="label" for="login-username">Tên đăng nhập</label>
+                    <input type="text" id="login-username" required autocomplete="username" autocapitalize="off" spellcheck="false" class="field">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Mật khẩu</label>
-                    <input type="password" id="login-password" required autocomplete="current-password" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+                    <label class="label" for="login-password">Mật khẩu</label>
+                    <input type="password" id="login-password" required autocomplete="current-password" class="field">
                 </div>
-                <p id="login-error" class="text-xs text-red-400 hidden"></p>
-                <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 text-white text-sm font-medium">Đăng Nhập</button>
+                <p id="login-error" class="text-xs text-red-400 hidden" role="alert"></p>
+                <button type="submit" class="btn-gold w-full py-2.5 rounded-lg text-sm">Đăng Nhập</button>
             </form>
         </div>
     </div>
 
     <!-- Message Modal -->
     <div id="message-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
-        <div class="bg-slate-950 border border-cyan-500/50 w-full max-w-sm rounded-2xl p-6 shadow-2xl text-center space-y-4 mx-4">
-            <div class="w-16 h-16 rounded-full bg-cyan-500/20 text-cyan-400 mx-auto flex items-center justify-center text-2xl border border-cyan-500/40">
-                <i class="fa-solid fa-bell"></i>
+        <div class="w-full max-w-sm rounded-xl p-6 text-center space-y-4 mx-4 panel" style="background: var(--ink-2);">
+            <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-2xl gold-text" style="background: rgba(212,166,74,0.12); border: 1px solid rgba(212,166,74,0.45);">
+                <i class="fa-solid fa-bell" aria-hidden="true"></i>
             </div>
-            <h3 id="msg-title" class="cinzel-font text-lg font-bold text-cyan-400">Thông Báo Giang Hồ</h3>
-            <p id="msg-body" class="text-sm text-slate-300">Nội dung...</p>
-            <button onclick="closeModal('message-modal')" class="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-sm">Đã Rõ</button>
+            <h3 id="msg-title" class="cinzel-font text-lg font-bold gold-glow">Thông Báo Giang Hồ</h3>
+            <p id="msg-body" class="text-sm">Nội dung...</p>
+            <button onclick="closeModal('message-modal')" class="btn-gold w-full py-2.5 rounded-lg text-sm">Đã Rõ</button>
         </div>
     </div>
 
     <script>
         // ============ CẤU HÌNH ============
-        // Dán Project URL và key CÔNG KHAI (publishable / anon) của bạn vào đây.
-        // KHÔNG dán key secret / service_role.
         const SUPABASE_URL = 'https://ijthpmzbwuoyxldhvmgo.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_vjrMTgdq1dWAGKLVwdhaqw_3pV0OJ_P';
-        // Email tài khoản Bang Chủ (đã tạo trong Supabase → Authentication → Users)
+        // Email tài khoản Bang Chủ trong Supabase → Authentication → Users
         const OWNER_EMAIL = 'dtvu0601it@gmail.com';
+        // Tên đăng nhập Bang Chủ → dùng email ở trên để đăng nhập Supabase.
+        // Mật khẩu KHÔNG để trong code, đặt trong Supabase (xem hướng dẫn kèm file).
+        const LOGIN_USERS = { 'mayconca': OWNER_EMAIL };
         // ==================================
 
         let supabaseClient = null;
         let session = null;
 
-        const TAB_ON = "tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 bg-cyan-600/20 text-cyan-300 border border-cyan-500/40";
-        const TAB_OFF = "tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 text-slate-300 hover:bg-slate-900 hover:text-cyan-300";
+        const TAB_ON = "tab-btn px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 text-yellow-200 bg-yellow-700/20 border border-yellow-600/50";
+        const TAB_OFF = "tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 text-stone-300 border border-transparent hover:text-yellow-200 hover:bg-yellow-900/20";
 
         const ROLE_LABEL = { leader: 'Đại đương gia', vice_leader: 'Phó đương gia', elder: 'Bang Chúng', member: 'Học Việc' };
         const ROLE_RANK = { leader: 0, vice_leader: 1, elder: 2, member: 3 };
 
-        let state = {
-            members: [], factions: [], rewards: [], spinLogs: [],
-            currentTab: 'members'
-        };
+        // Màu ô vòng quay: vàng kim, sơn mài đỏ, mực đen
+        const WHEEL_COLORS = [
+            { bg: '#c9963a', fg: '#1a1206' },
+            { bg: '#6e1c14', fg: '#f0cf7a' },
+            { bg: '#1c150c', fg: '#e7c46a' },
+            { bg: '#a87a2c', fg: '#1a1206' },
+            { bg: '#4a1410', fg: '#f0cf7a' },
+            { bg: '#2a1f12', fg: '#e7c46a' }
+        ];
+
+        let state = { members: [], factions: [], spinLogs: [], currentTab: 'members' };
         let wheelRotation = 0;
         let spinning = false;
 
@@ -386,8 +448,8 @@
 
         function updateConnectionStatus(ok, text) {
             document.getElementById('status-dot').className = ok
-                ? "w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]"
-                : "w-2.5 h-2.5 rounded-full bg-amber-500";
+                ? "w-2.5 h-2.5 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(240,207,122,0.8)]"
+                : "w-2.5 h-2.5 rounded-full bg-red-600";
             document.getElementById('status-text').textContent = text;
         }
 
@@ -428,6 +490,7 @@
             } else {
                 document.getElementById('login-error').classList.add('hidden');
                 openModal('login-modal');
+                setTimeout(() => document.getElementById('login-username').focus(), 50);
             }
         }
 
@@ -436,8 +499,11 @@
             const errBox = document.getElementById('login-error');
             errBox.classList.add('hidden');
             try {
+                const raw = document.getElementById('login-username').value.trim().toLowerCase();
+                const email = LOGIN_USERS[raw] || (raw.includes('@') ? raw : null);
+                if (!email) throw new Error('Sai tên đăng nhập hoặc mật khẩu.');
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: document.getElementById('login-email').value.trim(),
+                    email,
                     password: document.getElementById('login-password').value
                 });
                 if (error) throw error;
@@ -449,7 +515,7 @@
                 closeModal('login-modal');
                 showNotification('Thành công', 'Đã đăng nhập Bang Chủ.');
             } catch (err) {
-                errBox.textContent = err.message === 'Invalid login credentials' ? 'Sai email hoặc mật khẩu.' : err.message;
+                errBox.textContent = err.message === 'Invalid login credentials' ? 'Sai tên đăng nhập hoặc mật khẩu.' : err.message;
                 errBox.classList.remove('hidden');
             }
         }
@@ -463,10 +529,7 @@
                 const hidden = btn.classList.contains('hidden');
                 btn.className = (t === tabId ? TAB_ON : TAB_OFF) + (hidden ? ' hidden' : '');
             });
-            if (tabId === 'wheel') {
-                drawWheelCanvas();
-                setupWheelSelect();
-            }
+            if (tabId === 'wheel') drawWheelCanvas();
         }
 
         function toggleMobileMenu() {
@@ -490,7 +553,8 @@
                         { name: 'Tố Vấn', description: 'Trị liệu cứu người, ô kiếm song tu' },
                         { name: 'Cửu Linh', description: 'Triệu hồi dược linh, độc công vô hình' },
                         { name: 'Long Ngâm', description: 'Kiếm khí song hành, kiếm ý ngút trời' },
-                        { name: 'Hặc Sát', description: 'Ám sát chớp nhoáng, bạo kích chí mạng' }
+                        { name: 'Toái Mộng', description: 'Ám sát chớp nhoáng, bạo kích chí mạng' },
+                        { name: 'Huyền Cơ', description: 'Bùm chéo bùm chéo bùm bùm' }
                     ]);
                     const { data: f2 } = await supabaseClient.from('factions').select('*');
                     state.factions = f2 || [];
@@ -499,21 +563,6 @@
                 const { data: mData, error: mErr } = await supabaseClient.from('members').select('*, factions(name)');
                 if (mErr) throw mErr;
                 state.members = mData || [];
-
-                const { data: rData, error: rErr } = await supabaseClient.from('rewards').select('*');
-                if (rErr) throw rErr;
-                state.rewards = rData || [];
-
-                if (state.rewards.length === 0) {
-                    await supabaseClient.from('rewards').insert([
-                        { name: 'Giao Long Phục Ba', weight: 3, remaining: 2, description: 'Trang sức tuyệt phẩm giang hồ', active: true },
-                        { name: 'Tướng Thạch Cấp 3', weight: 10, remaining: 10, description: 'Đá cường hóa trang bị cao cấp', active: true },
-                        { name: 'Vân Thêu Đồ', weight: 20, remaining: 25, description: 'Nguyên liệu chế tạo ngoại trang', active: true },
-                        { name: 'Đồng Tiền Vàng x5000', weight: 67, remaining: null, description: 'Tiêu dao hành tẩu', active: true }
-                    ]);
-                    const { data: r2 } = await supabaseClient.from('rewards').select('*');
-                    state.rewards = r2 || [];
-                }
 
                 await loadSpinLogs();
 
@@ -528,7 +577,7 @@
                 updateConnectionStatus(true, 'Đã kết nối');
                 populateFactionDropdowns();
                 renderMembersTable();
-                if (state.currentTab === 'wheel') { drawWheelCanvas(); setupWheelSelect(); }
+                if (state.currentTab === 'wheel' && !spinning) drawWheelCanvas();
             } catch (err) {
                 console.warn('Không tải được dữ liệu Supabase, đang dùng dữ liệu mẫu:', err);
                 updateConnectionStatus(false, 'Lỗi kết nối - dữ liệu mẫu');
@@ -543,17 +592,12 @@
             ];
             state.members = [
                 { id: '1', username: 'Vô Tình', game_id: 'NTH-01', faction_id: 1, factions: { name: 'Thiết Y' }, role: 'leader', status: 'active' },
-                { id: '2', username: 'Diệp Sương', game_id: 'NTH-02', faction_id: 3, factions: { name: 'Tố Vấn' }, role: 'elder', status: 'active' }
-            ];
-            state.rewards = [
-                { id: 'r1', name: 'Giao Long Phục Ba', weight: 5, remaining: 3, active: true },
-                { id: 'r2', name: 'Tướng Thạch', weight: 20, remaining: 15, active: true },
-                { id: 'r3', name: 'Vàng Đồng', weight: 75, remaining: null, active: true }
             ];
             state.spinLogs = [];
             populateFactionDropdowns();
             renderMembersTable();
             renderLogsTable();
+            if (state.currentTab === 'wheel') drawWheelCanvas();
         }
 
         function populateFactionDropdowns() {
@@ -573,11 +617,11 @@
         // ============ MEMBERS ============
         function roleBadge(role) {
             const label = ROLE_LABEL[role] || ROLE_LABEL.member;
-            const cls = role === 'leader' ? 'bg-cyan-950 text-cyan-300 border border-cyan-700/50'
-                : role === 'vice_leader' ? 'bg-blue-950 text-blue-300 border border-blue-700/50'
-                : role === 'elder' ? 'bg-slate-800 text-slate-300 border border-slate-700'
-                : 'bg-slate-900 text-slate-400';
-            return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold ${cls}">${label}</span>`;
+            const style = role === 'leader' ? 'background:linear-gradient(180deg,#e7c46a,#a87a2c);color:#1a1206;border:1px solid #f0cf7a'
+                : role === 'vice_leader' ? 'background:rgba(122,31,22,0.45);color:#f0cf7a;border:1px solid rgba(212,166,74,0.5)'
+                : role === 'elder' ? 'background:rgba(212,166,74,0.1);color:#e7c46a;border:1px solid rgba(212,166,74,0.3)'
+                : 'background:rgba(255,255,255,0.04);color:#a8977a;border:1px solid rgba(168,151,122,0.25)';
+            return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap" style="${style}">${label}</span>`;
         }
 
         function renderMembersTable() {
@@ -602,29 +646,29 @@
             });
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500">Không tìm thấy hiệp khách phù hợp.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8" style="color:var(--muted)">Không tìm thấy hiệp khách phù hợp.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = filtered.map(m => {
                 const statusBadge = m.status === 'active'
-                    ? '<span class="text-cyan-400 font-medium">Hoạt động</span>'
+                    ? '<span class="font-semibold" style="color:#e7c46a">Hoạt động</span>'
                     : m.status === 'banned' ? '<span class="text-red-400">Trục xuất</span>'
-                    : '<span class="text-slate-500">Nghỉ</span>';
+                    : '<span style="color:var(--muted)">Nghỉ</span>';
                 const del = admin
-                    ? `<button onclick="deleteMember('${esc(m.id)}')" title="Xóa" class="text-slate-400 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>`
+                    ? `<button onclick="deleteMember('${esc(m.id)}')" title="Xóa" aria-label="Xóa ${esc(m.username)}" class="p-2 hover:text-red-400" style="color:var(--muted)"><i class="fa-solid fa-trash"></i></button>`
                     : '';
                 return `
-                    <tr class="hover:bg-slate-900/50 transition">
+                    <tr class="transition">
                         <td class="p-4">
-                            <div class="font-bold text-white">${esc(m.username)}</div>
-                            <div class="text-xs text-slate-400 font-mono">ID: ${esc(m.game_id || 'N/A')}</div>
+                            <div class="font-bold serif-font" style="color:#f5ecd6">${esc(m.username)}</div>
+                            <div class="text-xs font-mono" style="color:var(--muted)">ID: ${esc(m.game_id || 'N/A')}</div>
                         </td>
-                        <td class="p-4 text-slate-300">${esc(m.factions?.name || 'Vô Môn Phái')}</td>
+                        <td class="p-4">${esc(m.factions?.name || 'Vô Môn Phái')}</td>
                         <td class="p-4">${roleBadge(m.role)}</td>
                         <td class="p-4 text-center text-xs">${statusBadge}</td>
-                        <td class="p-4 text-center space-x-2">
-                            <button onclick="openEditMemberModal('${esc(m.id)}')" title="Sửa" class="text-slate-400 hover:text-cyan-400 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <td class="p-4 text-center space-x-1">
+                            <button onclick="openEditMemberModal('${esc(m.id)}')" title="Sửa" aria-label="Sửa ${esc(m.username)}" class="p-2 hover:text-yellow-300" style="color:var(--muted)"><i class="fa-solid fa-pen-to-square"></i></button>
                             ${del}
                         </td>
                     </tr>`;
@@ -693,88 +737,62 @@
             }
         }
 
-        // ============ WHEEL ============
-        function activeRewards() {
-            return state.rewards.filter(r => r.active && (r.remaining === null || r.remaining > 0));
-        }
+        // ============ WHEEL (tên thành viên) ============
+        let wheelEntries = [];
 
-        function setupWheelSelect() {
-            const sel = document.getElementById('wheel-member-select');
-            let opts = '<option value="">-- Chọn hiệp khách --</option>';
-            state.members.filter(m => m.status === 'active').forEach(m => {
-                opts += `<option value="${esc(m.id)}">${esc(m.username)} (${esc(m.factions?.name || 'Vô phái')})</option>`;
-            });
-            sel.innerHTML = opts;
-            sel.onchange = handleWheelMemberChange;
-            document.getElementById('spin-btn').disabled = true;
-            document.getElementById('wheel-member-status-box').classList.add('hidden');
-        }
-
-        function handleWheelMemberChange(e) {
-            const memberId = e.target.value;
-            const spinBtn = document.getElementById('spin-btn');
-            const statusBox = document.getElementById('wheel-member-status-box');
-
-            if (!memberId) {
-                spinBtn.disabled = true;
-                statusBox.classList.add('hidden');
-                return;
-            }
-            const m = state.members.find(x => String(x.id) === String(memberId));
-            if (!m) return;
-
-            document.getElementById('w-status-faction').textContent = m.factions?.name || 'Vô Môn Phái';
-            document.getElementById('w-status-role').textContent = ROLE_LABEL[m.role] || ROLE_LABEL.member;
-
+        function wheelCandidates() {
             const weekStart = getCurrentWeekStart();
-            const alreadySpun = state.spinLogs.some(l => String(l.member_id) === String(memberId) && l.week_start === weekStart);
-            const spunEl = document.getElementById('w-status-spun');
-            if (alreadySpun) {
-                spunEl.textContent = 'Đã quay tuần này rồi!';
-                spunEl.className = 'font-medium text-red-400';
-                spinBtn.disabled = true;
-            } else {
-                spunEl.textContent = 'Chưa quay - Sẵn sàng!';
-                spunEl.className = 'font-medium text-cyan-400';
-                spinBtn.disabled = spinning;
-            }
-            statusBox.classList.remove('hidden');
+            const exclude = document.getElementById('wheel-exclude-winners').checked;
+            const wonThisWeek = new Set(state.spinLogs.filter(l => l.week_start === weekStart).map(l => String(l.member_id)));
+            return state.members
+                .filter(m => m.status === 'active')
+                .filter(m => !exclude || !wonThisWeek.has(String(m.id)))
+                .sort((a, b) => a.username.localeCompare(b.username));
+        }
+
+        function fitName(ctx, name, maxWidth) {
+            if (ctx.measureText(name).width <= maxWidth) return name;
+            let s = name;
+            while (s.length > 1 && ctx.measureText(s + '…').width > maxWidth) s = s.slice(0, -1);
+            return s + '…';
         }
 
         function drawWheelCanvas() {
             const canvas = document.getElementById('wheel-canvas');
             const ctx = canvas.getContext('2d');
-            const rewards = activeRewards();
+            wheelEntries = wheelCandidates();
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const cx = canvas.width / 2, cy = canvas.height / 2;
-            const radius = canvas.width / 2 - 10;
+            document.getElementById('wheel-count').textContent = wheelEntries.length;
+            document.getElementById('wheel-week').textContent = getCurrentWeekStart();
+            document.getElementById('spin-btn').disabled = spinning || wheelEntries.length < 2;
 
-            if (rewards.length === 0) {
-                ctx.fillStyle = '#131c2e';
-                ctx.beginPath();
-                ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
-                ctx.fill();
-                ctx.fillStyle = '#06b6d4';
-                ctx.font = '16px Inter';
+            const W = canvas.width, cx = W / 2, cy = W / 2, radius = W / 2 - 6;
+            ctx.clearRect(0, 0, W, W);
+
+            if (wheelEntries.length === 0) {
+                ctx.fillStyle = '#17110a';
+                ctx.beginPath(); ctx.arc(cx, cy, radius, 0, 2 * Math.PI); ctx.fill();
+                ctx.fillStyle = '#d4a64a';
+                ctx.font = '600 32px "Noto Serif", serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('Kho báu vật đã hết!', cx, cy);
+                ctx.fillText('Chưa có ai trên vòng quay', cx, cy - 70);
                 return;
             }
 
-            const totalWeight = rewards.reduce((s, r) => s + Number(r.weight), 0);
-            let start = 0;
-            const colors = ['#0369a1', '#0e7490', '#155e75', '#164e63', '#0891b2', '#0284c7'];
+            const n = wheelEntries.length;
+            const slice = (2 * Math.PI) / n;
+            const fontSize = Math.max(14, Math.min(34, Math.floor(560 / Math.max(n, 6))));
 
-            rewards.forEach((r, i) => {
-                const slice = (Number(r.weight) / totalWeight) * 2 * Math.PI;
+            wheelEntries.forEach((m, i) => {
+                const start = i * slice;
+                const c = WHEEL_COLORS[(n % 6 === 1 && i === n - 1) ? 2 : i % WHEEL_COLORS.length];
                 ctx.beginPath();
                 ctx.moveTo(cx, cy);
                 ctx.arc(cx, cy, radius, start, start + slice);
                 ctx.closePath();
-                ctx.fillStyle = colors[i % colors.length];
+                ctx.fillStyle = c.bg;
                 ctx.fill();
-                ctx.strokeStyle = '#06b6d4';
+                ctx.strokeStyle = 'rgba(240,207,122,0.7)';
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
@@ -782,80 +800,67 @@
                 ctx.translate(cx, cy);
                 ctx.rotate(start + slice / 2);
                 ctx.textAlign = 'right';
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 12px Inter';
-                ctx.fillText(r.name.length > 14 ? r.name.substring(0, 12) + '...' : r.name, radius - 25, 5);
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = c.fg;
+                ctx.font = `700 ${fontSize}px "Noto Serif", serif`;
+                ctx.fillText(fitName(ctx, m.username, radius - 90), radius - 26, 0);
                 ctx.restore();
-
-                start += slice;
             });
+
+            // viền trong
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#f0cf7a';
+            ctx.lineWidth = 6;
+            ctx.stroke();
         }
 
         async function spinWheel() {
             if (spinning) return;
-            const memberId = document.getElementById('wheel-member-select').value;
-            if (!memberId) return;
+            drawWheelCanvas();
+            if (wheelEntries.length < 2) return showNotification('Thông báo', 'Cần ít nhất 2 hiệp khách trên vòng quay.');
 
-            const rewards = activeRewards();
-            if (rewards.length === 0) return showNotification('Thông báo', 'Kho báu vật đã hết phần thưởng!');
-
-            const member = state.members.find(m => String(m.id) === String(memberId));
+            const entries = wheelEntries.slice();
+            const n = entries.length;
+            const idx = Math.floor(Math.random() * n);
+            const winner = entries[idx];
+            const prize = document.getElementById('wheel-prize').value.trim() || 'Phần thưởng tuần';
             const weekStart = getCurrentWeekStart();
-            if (state.spinLogs.some(l => String(l.member_id) === String(memberId) && l.week_start === weekStart)) {
-                return showNotification('Thông báo', 'Hiệp khách này đã quay tuần này rồi.');
-            }
 
-            // Chọn phần thưởng theo trọng số
-            const totalWeight = rewards.reduce((s, r) => s + Number(r.weight), 0);
-            let rnd = Math.random() * totalWeight;
-            let selected = rewards[rewards.length - 1];
-            let before = 0;
-            for (const r of rewards) {
-                if (rnd < Number(r.weight)) { selected = r; break; }
-                rnd -= Number(r.weight);
-                before += Number(r.weight);
-            }
-
-            // Tính góc để kim (ở trên cùng) dừng đúng ô trúng thưởng
-            const sliceStart = (before / totalWeight) * 360;
-            const sliceSize = (Number(selected.weight) / totalWeight) * 360;
-            const target = sliceStart + sliceSize * (0.15 + Math.random() * 0.7);
+            // Kim ở trên cùng (270°). Đưa giữa ô trúng về vị trí kim.
+            const sliceDeg = 360 / n;
+            const target = idx * sliceDeg + sliceDeg * (0.2 + Math.random() * 0.6);
             const desired = ((270 - target) % 360 + 360) % 360;
             const current = ((wheelRotation % 360) + 360) % 360;
-            wheelRotation += 360 * 5 + ((desired - current) % 360 + 360) % 360;
+            wheelRotation += 360 * 6 + ((desired - current) % 360 + 360) % 360;
 
             spinning = true;
             document.getElementById('spin-btn').disabled = true;
             document.getElementById('spin-result-box').classList.add('hidden');
             document.getElementById('wheel-canvas').style.transform = `rotate(${wheelRotation}deg)`;
 
+            const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1100 : 5200;
             setTimeout(async () => {
+                document.getElementById('spin-result-text').textContent = `${winner.username} — ${prize}`;
+                document.getElementById('spin-result-box').classList.remove('hidden');
                 try {
-                    const logPayload = {
-                        member_id: member.id,
-                        reward_id: selected.id,
-                        member_name: member.username,
-                        reward_name: selected.name,
+                    if (!supabaseClient) throw new Error('Chưa kết nối Supabase, kết quả chưa được lưu.');
+                    const { error } = await supabaseClient.from('spin_logs').insert([{
+                        member_id: winner.id,
+                        member_name: winner.username,
+                        reward_name: prize,
                         week_start: weekStart,
                         claimed: false
-                    };
-                    const { error: logErr } = await supabaseClient.from('spin_logs').insert([logPayload]);
-                    if (logErr) throw logErr;
-
-                    if (selected.remaining !== null && selected.remaining > 0) {
-                        await supabaseClient.from('rewards').update({ remaining: selected.remaining - 1 }).eq('id', selected.id);
-                    }
-
-                    document.getElementById('spin-result-text').textContent = `${member.username} đã nhận được: ${selected.name}!`;
-                    document.getElementById('spin-result-box').classList.remove('hidden');
-                    await loadAllData();
+                    }]);
+                    if (error) throw error;
+                    await loadSpinLogs();
                 } catch (err) {
-                    showNotification('Lỗi', err.message);
+                    showNotification('Chưa lưu được kết quả', err.message);
                 } finally {
                     spinning = false;
-                    setupWheelSelect();
+                    drawWheelCanvas();
                 }
-            }, 4200);
+            }, duration);
         }
 
         // ============ LOGS ============
@@ -876,26 +881,26 @@
             const tbody = document.getElementById('logs-table-body');
             const admin = isAdmin();
             if (state.spinLogs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500">Chưa có lịch sử quay thưởng nào.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8" style="color:var(--muted)">Chưa có lịch sử quay thưởng nào.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = state.spinLogs.map(l => {
                 const dateStr = new Date(l.spun_at || Date.now()).toLocaleString('vi-VN');
                 let claimed;
-                if (l.claimed) claimed = '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-950 text-cyan-300 border border-cyan-800">Đã trao</span>';
-                else if (admin) claimed = `<button onclick="toggleClaimLog('${esc(l.id)}', true)" class="px-3 py-1 rounded-lg text-xs font-semibold bg-cyan-600 hover:bg-cyan-500 text-white transition">Xác nhận trao</button>`;
-                else claimed = '<span class="text-xs text-slate-500">Chờ trao</span>';
+                if (l.claimed) claimed = '<span class="px-2.5 py-1 rounded-full text-xs font-semibold" style="background:rgba(212,166,74,0.15);color:#f0cf7a;border:1px solid rgba(212,166,74,0.4)">Đã trao</span>';
+                else if (admin) claimed = `<button onclick="toggleClaimLog('${esc(l.id)}', true)" class="btn-gold px-3 py-1.5 rounded-md text-xs">Xác nhận trao</button>`;
+                else claimed = '<span class="text-xs" style="color:var(--muted)">Chờ trao</span>';
                 const del = admin
-                    ? `<button onclick="deleteLog('${esc(l.id)}')" title="Xóa" class="text-slate-400 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>`
-                    : '<span class="text-slate-700">-</span>';
+                    ? `<button onclick="deleteLog('${esc(l.id)}')" title="Xóa" aria-label="Xóa bản ghi" class="p-2 hover:text-red-400" style="color:var(--muted)"><i class="fa-solid fa-trash"></i></button>`
+                    : '<span style="color:#4a3d28">-</span>';
 
                 return `
-                    <tr class="hover:bg-slate-900/50 transition">
-                        <td class="p-4 font-mono text-slate-400">${esc(l.week_start)}</td>
-                        <td class="p-4 font-bold text-white">${esc(l.member_name)}</td>
-                        <td class="p-4 text-cyan-400 font-medium">${esc(l.reward_name)}</td>
-                        <td class="p-4 text-slate-400 text-xs">${dateStr}</td>
+                    <tr class="transition">
+                        <td class="p-4 font-mono" style="color:var(--muted)">${esc(l.week_start)}</td>
+                        <td class="p-4 font-bold serif-font" style="color:#f5ecd6">${esc(l.member_name)}</td>
+                        <td class="p-4 font-semibold" style="color:#e7c46a">${esc(l.reward_name)}</td>
+                        <td class="p-4 text-xs" style="color:var(--muted)">${dateStr}</td>
                         <td class="p-4 text-center">${claimed}</td>
                         <td class="p-4 text-center">${del}</td>
                     </tr>`;
@@ -924,6 +929,7 @@
                 if (error) throw error;
                 if (!data || data.length === 0) throw new Error('Không xóa được. Bạn không có quyền hoặc bản ghi không tồn tại.');
                 await loadSpinLogs();
+                if (state.currentTab === 'wheel') drawWheelCanvas();
             } catch (err) {
                 showNotification('Lỗi', err.message);
             }
@@ -949,6 +955,9 @@
         // ============ MODAL ============
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') ['message-modal', 'login-modal', 'member-modal'].forEach(closeModal);
+        });
         function showNotification(title, body) {
             document.getElementById('msg-title').textContent = title;
             document.getElementById('msg-body').textContent = body;
