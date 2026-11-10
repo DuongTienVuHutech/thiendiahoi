@@ -553,8 +553,7 @@
                         { name: 'Tố Vấn', description: 'Trị liệu cứu người, ô kiếm song tu' },
                         { name: 'Cửu Linh', description: 'Triệu hồi dược linh, độc công vô hình' },
                         { name: 'Long Ngâm', description: 'Kiếm khí song hành, kiếm ý ngút trời' },
-                        { name: 'Toái Mộng', description: 'Ám sát chớp nhoáng, bạo kích chí mạng' },
-                        { name: 'Huyền Cơ', description: 'Bùm chéo bùm chéo bùm bùm' }
+                        { name: 'Hặc Sát', description: 'Ám sát chớp nhoáng, bạo kích chí mạng' }
                     ]);
                     const { data: f2 } = await supabaseClient.from('factions').select('*');
                     state.factions = f2 || [];
@@ -582,6 +581,7 @@
                 console.warn('Không tải được dữ liệu Supabase, đang dùng dữ liệu mẫu:', err);
                 updateConnectionStatus(false, 'Lỗi kết nối - dữ liệu mẫu');
                 loadMockFallback();
+                showNotification('Không tải được dữ liệu', (err && (err.message || err.details || err.hint)) || String(err));
             }
         }
 
@@ -592,6 +592,9 @@
             ];
             state.members = [
                 { id: '1', username: 'Vô Tình', game_id: 'NTH-01', faction_id: 1, factions: { name: 'Thiết Y' }, role: 'leader', status: 'active' },
+                { id: '2', username: 'Diệp Sương', game_id: 'NTH-02', faction_id: 3, factions: { name: 'Tố Vấn' }, role: 'elder', status: 'active' },
+                { id: '3', username: 'Lãnh Huyết', game_id: 'NTH-03', faction_id: 2, factions: { name: 'Huyết Hà' }, role: 'member', status: 'active' },
+                { id: '4', username: 'Thiết Thủ', game_id: 'NTH-04', faction_id: 4, factions: { name: 'Long Ngâm' }, role: 'member', status: 'active' }
             ];
             state.spinLogs = [];
             populateFactionDropdowns();
