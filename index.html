@@ -470,7 +470,40 @@
             applyAdminUI();
             switchTab('members');
             await loadAllData();
+            subscribeRealtime();
         });
+
+        // ============ REALTIME ============
+        let dbChannel = null, wheelChannel = null;
+        let reloadTimer = null, reloadPending = false, realtimeOk = false;
+
+        function scheduleReload() {
+            // gom nhiều thay đổi liên tiếp thành 1 lần tải lại
+            if (spinning) { reloadPending = true; return; }
+            clearTimeout(reloadTimer);
+            reloadTimer = setTimeout(() => loadAllData({ silent: true }), 300);
+        }
+
+        function subscribeRealtime() {
+            if (!supabaseClient) return;
+
+            dbChannel = supabaseClient.channel('thuy-han-db');
+            ['members', 'factions', 'spin_logs', 'guild_settings'].forEach(table => {
+                dbChannel.on('postgres_changes', { event: '*', schema: 'public', table }, scheduleReload);
+            });
+            dbChannel.subscribe(status => {
+                realtimeOk = status === 'SUBSCRIBED';
+                if (realtimeOk) updateConnectionStatus(true, 'Trực tiếp');
+                else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') updateConnectionStatus(false, 'Mất realtime - đang thử lại');
+                // tải lại khi vừa kết nối lại để không lỡ thay đổi
+                if (realtimeOk) scheduleReload();
+            });
+
+            // Kênh phát sóng: mọi người cùng xem vòng quay đang chạy
+            wheelChannel = supabaseClient.channel('thuy-han-wheel', { config: { broadcast: { self: false } } });
+            wheelChannel.on('broadcast', { event: 'spin' }, ({ payload }) => playRemoteSpin(payload));
+            wheelChannel.subscribe();
+        }
 
         // ============ ADMIN ============
         function applyAdminUI() {
@@ -537,7 +570,7 @@
         }
 
         // ============ DATA ============
-        async function loadAllData() {
+        async function loadAllData(opts = {}) {
             try {
                 if (!supabaseClient) throw new Error('Chưa khởi tạo Supabase');
 
@@ -573,12 +606,13 @@
                     document.getElementById('setting-guild-slogan').value = sData.slogan;
                 }
 
-                updateConnectionStatus(true, 'Đã kết nối');
+                updateConnectionStatus(true, realtimeOk ? 'Trực tiếp' : 'Đã kết nối');
                 populateFactionDropdowns();
                 renderMembersTable();
                 if (state.currentTab === 'wheel' && !spinning) drawWheelCanvas();
             } catch (err) {
-                console.warn('Không tải được dữ liệu Supabase, đang dùng dữ liệu mẫu:', err);
+                console.warn('Không tải được dữ liệu Supabase:', err);
+                if (opts.silent) { updateConnectionStatus(false, 'Lỗi tải lại'); return; }
                 updateConnectionStatus(false, 'Lỗi kết nối - dữ liệu mẫu');
                 loadMockFallback();
                 showNotification('Không tải được dữ liệu', (err && (err.message || err.details || err.hint)) || String(err));
@@ -760,10 +794,11 @@
             return s + '…';
         }
 
-        function drawWheelCanvas() {
+        function drawWheelCanvas(entriesOverride) {
             const canvas = document.getElementById('wheel-canvas');
             const ctx = canvas.getContext('2d');
-            wheelEntries = wheelCandidates();
+            if (spinning && !entriesOverride) return; // không vẽ lại khi đang quay
+            wheelEntries = entriesOverride || wheelCandidates();
 
             document.getElementById('wheel-count').textContent = wheelEntries.length;
             document.getElementById('wheel-week').textContent = getCurrentWeekStart();
@@ -824,46 +859,78 @@
             if (wheelEntries.length < 2) return showNotification('Thông báo', 'Cần ít nhất 2 hiệp khách trên vòng quay.');
 
             const entries = wheelEntries.slice();
-            const n = entries.length;
-            const idx = Math.floor(Math.random() * n);
-            const winner = entries[idx];
+            const idx = Math.floor(Math.random() * entries.length);
+            const frac = 0.2 + Math.random() * 0.6;
             const prize = document.getElementById('wheel-prize').value.trim() || 'Phần thưởng tuần';
-            const weekStart = getCurrentWeekStart();
 
-            // Kim ở trên cùng (270°). Đưa giữa ô trúng về vị trí kim.
-            const sliceDeg = 360 / n;
-            const target = idx * sliceDeg + sliceDeg * (0.2 + Math.random() * 0.6);
-            const desired = ((270 - target) % 360 + 360) % 360;
-            const current = ((wheelRotation % 360) + 360) % 360;
-            wheelRotation += 360 * 6 + ((desired - current) % 360 + 360) % 360;
+            // Báo cho mọi người đang mở trang để họ xem cùng lúc
+            if (wheelChannel) {
+                wheelChannel.send({
+                    type: 'broadcast', event: 'spin',
+                    payload: { ids: entries.map(m => String(m.id)), names: entries.map(m => m.username), idx, frac, prize }
+                });
+            }
 
-            spinning = true;
-            document.getElementById('spin-btn').disabled = true;
-            document.getElementById('spin-result-box').classList.add('hidden');
-            document.getElementById('wheel-canvas').style.transform = `rotate(${wheelRotation}deg)`;
+            await animateSpin(entries, idx, frac, prize);
 
-            const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1100 : 5200;
-            setTimeout(async () => {
-                document.getElementById('spin-result-text').textContent = `${winner.username} — ${prize}`;
-                document.getElementById('spin-result-box').classList.remove('hidden');
-                try {
-                    if (!supabaseClient) throw new Error('Chưa kết nối Supabase, kết quả chưa được lưu.');
-                    const { error } = await supabaseClient.from('spin_logs').insert([{
-                        member_id: winner.id,
-                        member_name: winner.username,
-                        reward_name: prize,
-                        week_start: weekStart,
-                        claimed: false
-                    }]);
-                    if (error) throw error;
-                    await loadSpinLogs();
-                } catch (err) {
-                    showNotification('Chưa lưu được kết quả', err.message);
-                } finally {
-                    spinning = false;
-                    drawWheelCanvas();
-                }
-            }, duration);
+            const winner = entries[idx];
+            try {
+                if (!supabaseClient) throw new Error('Chưa kết nối Supabase, kết quả chưa được lưu.');
+                const { error } = await supabaseClient.from('spin_logs').insert([{
+                    member_id: winner.id,
+                    member_name: winner.username,
+                    reward_name: prize,
+                    week_start: getCurrentWeekStart(),
+                    claimed: false
+                }]);
+                if (error) throw error;
+                await loadSpinLogs();
+            } catch (err) {
+                showNotification('Chưa lưu được kết quả', err.message);
+            } finally {
+                finishSpin();
+            }
+        }
+
+        // Người khác bấm quay → trang này chạy y hệt (chỉ xem, không ghi sổ)
+        async function playRemoteSpin(p) {
+            if (!p || !Array.isArray(p.ids) || spinning) return;
+            const entries = p.ids.map((id, i) =>
+                state.members.find(m => String(m.id) === id) || { id, username: p.names?.[i] || '?' });
+            if (entries.length < 2 || p.idx < 0 || p.idx >= entries.length) return;
+            if (state.currentTab !== 'wheel') switchTab('wheel');
+            await animateSpin(entries, p.idx, Number(p.frac) || 0.5, String(p.prize || 'Phần thưởng tuần'));
+            finishSpin();
+        }
+
+        function animateSpin(entries, idx, frac, prize) {
+            return new Promise(resolve => {
+                spinning = true;
+                drawWheelCanvas(entries);
+                document.getElementById('spin-btn').disabled = true;
+                document.getElementById('spin-result-box').classList.add('hidden');
+
+                // Kim ở trên cùng (270°). Đưa vị trí trong ô trúng về chỗ kim.
+                const sliceDeg = 360 / entries.length;
+                const target = idx * sliceDeg + sliceDeg * frac;
+                const desired = ((270 - target) % 360 + 360) % 360;
+                const current = ((wheelRotation % 360) + 360) % 360;
+                wheelRotation += 360 * 6 + ((desired - current) % 360 + 360) % 360;
+                document.getElementById('wheel-canvas').style.transform = `rotate(${wheelRotation}deg)`;
+
+                const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1100 : 5200;
+                setTimeout(() => {
+                    document.getElementById('spin-result-text').textContent = `${entries[idx].username} — ${prize}`;
+                    document.getElementById('spin-result-box').classList.remove('hidden');
+                    resolve();
+                }, duration);
+            });
+        }
+
+        function finishSpin() {
+            spinning = false;
+            if (reloadPending) { reloadPending = false; scheduleReload(); }
+            else drawWheelCanvas();
         }
 
         // ============ LOGS ============
