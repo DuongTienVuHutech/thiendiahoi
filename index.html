@@ -3,33 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nghịch Thủy Hàn - Thiên Địa Hộii</title>
-    <!-- Tailwind CSS -->
+    <title>Nghịch Thủy Hàn - Thủy Hàn Bang Hội</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        justice: {
-                            dark: '#080c14',
-                            card: '#131c2e',
-                            gold: '#d97706',
-                            cyan: '#06b6d4',
-                            red: '#be123c',
-                            accent: '#f59e0b',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Font Cinzel & Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
@@ -39,34 +16,17 @@
             background-image: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #060911 80%);
             min-height: 100vh;
         }
-        .cinzel-font {
-            font-family: 'Cinzel', serif;
-        }
+        .cinzel-font { font-family: 'Cinzel', serif; }
         .justice-border {
             border: 1px solid rgba(6, 182, 212, 0.3);
             box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
         }
-        .justice-gold-border {
-            border: 1px solid rgba(217, 119, 6, 0.4);
-            box-shadow: 0 0 20px rgba(217, 119, 6, 0.15);
-        }
-        .justice-glow {
-            text-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
-        }
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #080c14;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #06b6d4;
-        }
+        .justice-glow { text-shadow: 0 0 12px rgba(6, 182, 212, 0.6); }
+        #wheel-canvas { transition: transform 4s cubic-bezier(0.15, 0.9, 0.2, 1); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #080c14; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
     </style>
 </head>
 <body class="antialiased selection:bg-cyan-500 selection:text-white">
@@ -74,7 +34,7 @@
     <div id="app" class="flex flex-col min-h-screen">
 
         <!-- Header -->
-        <header class="bg-slate-950/90 backdrop-blur border-b border-cyan-500/30 sticky top-0 z-50">
+        <header class="bg-slate-950/90 backdrop-blur border-b border-cyan-500/30 sticky top-0 z-40">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-900 flex items-center justify-center justice-border shadow-lg">
@@ -86,90 +46,75 @@
                     </div>
                 </div>
 
-                <!-- Nav Tabs -->
                 <nav class="hidden md:flex space-x-1 lg:space-x-2">
-                    <button onclick="switchTab('members')" id="nav-members" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 bg-cyan-600/20 text-cyan-300 border border-cyan-500/40">
-                        <i class="fa-solid fa-users-line mr-2"></i> Bang Chúng
-                    </button>
-                    <button onclick="switchTab('wheel')" id="nav-wheel" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 text-slate-300 hover:bg-slate-900 hover:text-cyan-300">
-                        <i class="fa-solid fa-dharmachakra mr-2"></i> Vòng Quay Tuần
-                    </button>
-                    <button onclick="switchTab('logs')" id="nav-logs" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 text-slate-300 hover:bg-slate-900 hover:text-cyan-300">
-                        <i class="fa-solid fa-book-journal-whills mr-2"></i> Sổ Ban Thưởng
-                    </button>
-                    <button onclick="switchTab('rewards')" id="nav-rewards" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 text-slate-300 hover:bg-slate-900 hover:text-cyan-300">
-                        <i class="fa-solid fa-chest mr-2"></i> Kho Báu Vật
-                    </button>
-                    <button onclick="switchTab('settings')" id="nav-settings" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 text-slate-300 hover:bg-slate-900 hover:text-cyan-300">
-                        <i class="fa-solid fa-sliders mr-2"></i> Cấu Hình Supabase
-                    </button>
+                    <button onclick="switchTab('members')" id="nav-members" class="tab-btn"><i class="fa-solid fa-users-line mr-2"></i> Bang Chúng</button>
+                    <button onclick="switchTab('wheel')" id="nav-wheel" class="tab-btn"><i class="fa-solid fa-dharmachakra mr-2"></i> Vòng Quay Tuần</button>
+                    <button onclick="switchTab('logs')" id="nav-logs" class="tab-btn"><i class="fa-solid fa-book-journal-whills mr-2"></i> Sổ Ban Thưởng</button>
+                    <button onclick="switchTab('settings')" id="nav-settings" class="tab-btn hidden"><i class="fa-solid fa-sliders mr-2"></i> Thiết Lập Bang</button>
                 </nav>
 
-                <!-- Status & Mobile Button -->
                 <div class="flex items-center space-x-3">
-                    <div id="db-status" class="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800 text-xs cursor-pointer" onclick="switchTab('settings')">
-                        <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse" id="status-dot"></span>
-                        <span id="status-text" class="text-slate-300 font-mono">Supabase Connected</span>
+                    <div class="flex items-center space-x-2 bg-slate-900 px-3 py-1.5 rounded-full border border-slate-800 text-xs">
+                        <span class="w-2.5 h-2.5 rounded-full bg-slate-500" id="status-dot"></span>
+                        <span id="status-text" class="text-slate-300 font-mono">Đang kết nối...</span>
                     </div>
+                    <button id="admin-btn" onclick="handleAdminClick()" class="hidden sm:flex items-center px-3 py-1.5 rounded-full border border-slate-700 text-xs text-slate-300 hover:border-cyan-500 hover:text-cyan-300 transition">
+                        <i class="fa-solid fa-key mr-2"></i><span id="admin-btn-text">Bang Chủ đăng nhập</span>
+                    </button>
                     <button onclick="toggleMobileMenu()" class="md:hidden text-slate-300 hover:text-cyan-400 p-2">
                         <i class="fa-solid fa-bars text-xl"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Mobile Nav -->
             <div id="mobile-menu" class="hidden md:hidden bg-slate-950 border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
                 <button onclick="switchTab('members'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-900">Bang Chúng</button>
                 <button onclick="switchTab('wheel'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-900">Vòng Quay Tuần</button>
                 <button onclick="switchTab('logs'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-900">Sổ Ban Thưởng</button>
-                <button onclick="switchTab('rewards'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-900">Kho Báu Vật</button>
-                <button onclick="switchTab('settings'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-900">Cấu Hình Supabase</button>
+                <button id="mobile-nav-settings" onclick="switchTab('settings'); toggleMobileMenu();" class="hidden w-full text-left px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-900">Thiết Lập Bang</button>
+                <button onclick="handleAdminClick(); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm text-cyan-300 hover:bg-slate-900" id="mobile-admin-btn">Bang Chủ đăng nhập</button>
             </div>
         </header>
 
-        <!-- Main Body -->
         <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-            <!-- TAB 1: MEMBERS -->
+            <!-- TAB: MEMBERS -->
             <section id="tab-content-members" class="space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/60 p-6 rounded-2xl justice-border">
                     <div>
                         <h2 class="cinzel-font text-2xl font-bold text-cyan-400 flex items-center">
                             <i class="fa-solid fa-users mr-3 text-cyan-500"></i> Danh Sách Bang Chúng Nghịch Thủy Hàn
                         </h2>
-                        <p class="text-sm text-slate-400 mt-1">Quản lý hiệp khách các môn phái, chiến lực, cống hiến và chức vụ bang.</p>
+                        <p class="text-sm text-slate-400 mt-1">Quản lý hiệp khách, môn phái và chức vụ trong bang.</p>
                     </div>
                     <button onclick="openAddMemberModal()" class="bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white font-medium px-4 py-2 rounded-xl shadow-lg transition-all duration-200 flex items-center border border-cyan-400/40">
                         <i class="fa-solid fa-user-plus mr-2"></i> Chiêu Mộ Hiệp Khách
                     </button>
                 </div>
 
-                <!-- Filters -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-900/40 p-4 rounded-xl border border-slate-800">
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Tìm kiếm hiệp khách</label>
                         <div class="relative">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-sm"></i>
-                            <input type="text" id="search-member" oninput="filterMembers()" placeholder="Tên nhân vật hoặc ID game..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+                            <input type="text" id="search-member" oninput="renderMembersTable()" placeholder="Tên nhân vật hoặc ID game..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
                         </div>
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Môn Phái</label>
-                        <select id="filter-faction" onchange="filterMembers()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+                        <select id="filter-faction" onchange="renderMembersTable()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
                             <option value="">Tất cả môn phái</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-400 mb-1">Sắp xếp</label>
-                        <select id="sort-members" onchange="filterMembers()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                            <option value="power-desc">Chiến lực: Cao đến Thấp</option>
-                            <option value="contribution-desc">Cống hiến: Nhiều đến Ít</option>
+                        <select id="sort-members" onchange="renderMembersTable()" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+                            <option value="role">Chức vị</option>
                             <option value="name-asc">Tên: A - Z</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Table -->
                 <div class="bg-slate-900/80 rounded-2xl justice-border overflow-hidden shadow-xl">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -178,28 +123,22 @@
                                     <th class="p-4">Hiệp Khách & ID</th>
                                     <th class="p-4">Môn Phái</th>
                                     <th class="p-4">Chức Vị</th>
-                                    <th class="p-4 text-right">Chiến Lực</th>
-                                    <th class="p-4 text-right">Cống Hiến Tuần</th>
                                     <th class="p-4 text-center">Trạng Thái</th>
                                     <th class="p-4 text-center">Thao Tác</th>
                                 </tr>
                             </thead>
                             <tbody id="members-table-body" class="divide-y divide-slate-800/80 text-sm">
-                                <tr>
-                                    <td colspan="7" class="text-center py-8 text-slate-500">Đang tải danh sách bang chúng...</td>
-                                </tr>
+                                <tr><td colspan="5" class="text-center py-8 text-slate-500">Đang tải danh sách bang chúng...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 2: WHEEL -->
+            <!-- TAB: WHEEL -->
             <section id="tab-content-wheel" class="hidden space-y-6">
                 <div class="bg-slate-900/60 p-6 rounded-2xl justice-border text-center relative overflow-hidden">
-                    <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl text-cyan-500">
-                        <i class="fa-solid fa-dharmachakra"></i>
-                    </div>
+                    <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl text-cyan-500"><i class="fa-solid fa-dharmachakra"></i></div>
                     <h2 class="cinzel-font text-3xl font-bold text-cyan-400 justice-glow mb-2">Vòng Quay Thiên Mệnh Thủy Hàn</h2>
                     <p class="text-sm text-slate-400 max-w-2xl mx-auto">Mỗi anh tài chỉ được quay 1 lần mỗi tuần để nhận bảo vật hiếm từ bang hội. Vận may giang hồ vẫy gọi!</p>
                 </div>
@@ -207,7 +146,6 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                     <div class="lg:col-span-1 bg-slate-900/80 p-6 rounded-2xl justice-border space-y-6">
                         <h3 class="cinzel-font text-xl font-bold text-cyan-400 border-b border-slate-800 pb-3">Chọn Hiệp Khách Quay Thưởng</h3>
-                        
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-xs font-medium text-slate-400 mb-1">Chọn Thành Viên</label>
@@ -215,13 +153,11 @@
                                     <option value="">-- Chọn hiệp khách --</option>
                                 </select>
                             </div>
-
                             <div id="wheel-member-status-box" class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-xs space-y-2 hidden">
                                 <div class="flex justify-between"><span class="text-slate-400">Môn phái:</span> <span id="w-status-faction" class="font-medium text-white">-</span></div>
                                 <div class="flex justify-between"><span class="text-slate-400">Chức vị:</span> <span id="w-status-role" class="font-medium text-white">-</span></div>
                                 <div class="flex justify-between"><span class="text-slate-400">Trạng thái tuần:</span> <span id="w-status-spun" class="font-medium text-cyan-400">-</span></div>
                             </div>
-
                             <button id="spin-btn" onclick="spinWheel()" disabled class="w-full py-4 rounded-xl font-bold cinzel-font tracking-wider bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-cyan-400/40">
                                 <i class="fa-solid fa-dharmachakra mr-2"></i> KÍCH HOẠT VÒNG QUAY
                             </button>
@@ -232,15 +168,13 @@
                         <div class="absolute top-4 z-20 text-cyan-400 text-4xl filter drop-shadow-[0_2px_6px_rgba(6,182,212,0.8)]">
                             <i class="fa-solid fa-caret-down"></i>
                         </div>
-
                         <div class="relative w-80 h-80 sm:w-96 sm:h-96 my-4">
-                            <canvas id="wheel-canvas" width="400" height="400" class="w-full h-full rounded-full shadow-2xl border-4 border-cyan-600/60 transition-transform duration-[4000ms] cubic-bezier(0.15, 0.9, 0.2, 1)"></canvas>
+                            <canvas id="wheel-canvas" width="400" height="400" class="w-full h-full rounded-full shadow-2xl border-4 border-cyan-600/60"></canvas>
                             <div class="absolute inset-0 m-auto w-16 h-16 rounded-full bg-gradient-to-br from-cyan-600 to-blue-900 border-4 border-slate-950 shadow-xl flex items-center justify-center z-10">
                                 <i class="fa-solid fa-water text-white text-xl"></i>
                             </div>
                         </div>
-
-                        <div id="spin-result-box" class="hidden mt-6 text-center bg-cyan-950/40 border border-cyan-500/50 p-4 rounded-xl w-full max-w-md animate-bounce">
+                        <div id="spin-result-box" class="hidden mt-6 text-center bg-cyan-950/40 border border-cyan-500/50 p-4 rounded-xl w-full max-w-md">
                             <p class="text-xs text-cyan-300 font-medium uppercase tracking-wider">Thiên Mệnh Đã Định</p>
                             <h4 id="spin-result-text" class="cinzel-font text-xl font-bold text-cyan-100 mt-1"></h4>
                         </div>
@@ -248,7 +182,7 @@
                 </div>
             </section>
 
-            <!-- TAB 3: LOGS -->
+            <!-- TAB: LOGS -->
             <section id="tab-content-logs" class="hidden space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/60 p-6 rounded-2xl justice-border">
                     <div>
@@ -276,85 +210,35 @@
                                 </tr>
                             </thead>
                             <tbody id="logs-table-body" class="divide-y divide-slate-800/80 text-sm">
-                                <tr>
-                                    <td colspan="6" class="text-center py-8 text-slate-500">Đang tải sổ ban thưởng...</td>
-                                </tr>
+                                <tr><td colspan="6" class="text-center py-8 text-slate-500">Đang tải sổ ban thưởng...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 4: REWARDS -->
-            <section id="tab-content-rewards" class="hidden space-y-6">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/60 p-6 rounded-2xl justice-border">
-                    <div>
-                        <h2 class="cinzel-font text-2xl font-bold text-cyan-400 flex items-center">
-                            <i class="fa-solid fa-chest mr-3 text-cyan-500"></i> Kho Báu Vật & Tỷ Lệ Vòng Quay
-                        </h2>
-                        <p class="text-sm text-slate-400 mt-1">Cấu hình danh sách phần thưởng, trọng số và số lượng tồn kho.</p>
-                    </div>
-                    <button onclick="openAddRewardModal()" class="bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 text-white font-medium px-4 py-2 rounded-xl shadow-lg transition-all duration-200 flex items-center border border-cyan-400/40">
-                        <i class="fa-solid fa-plus mr-2"></i> Thêm Báu Vật Mới
-                    </button>
-                </div>
-
-                <div class="bg-slate-900/80 rounded-2xl justice-border overflow-hidden shadow-xl">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-950/90 text-cyan-400 text-xs cinzel-font tracking-wider border-b border-slate-800">
-                                    <th class="p-4">Tên Báu Vật</th>
-                                    <th class="p-4">Mô Tả</th>
-                                    <th class="p-4 text-right">Trọng Số (Tỷ Lệ)</th>
-                                    <th class="p-4 text-right">Tồn Kho</th>
-                                    <th class="p-4 text-center">Trạng Thái</th>
-                                    <th class="p-4 text-center">Thao Tác</th>
-                                </tr>
-                            </thead>
-                            <tbody id="rewards-table-body" class="divide-y divide-slate-800/80 text-sm">
-                                <tr>
-                                    <td colspan="6" class="text-center py-8 text-slate-500">Đang tải kho báu vật...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 5: SETTINGS / SUPABASE CONFIG -->
+            <!-- TAB: SETTINGS (chỉ Bang Chủ) -->
             <section id="tab-content-settings" class="hidden space-y-6 max-w-3xl mx-auto">
                 <div class="bg-slate-900/60 p-6 rounded-2xl justice-border">
                     <h2 class="cinzel-font text-2xl font-bold text-cyan-400 flex items-center mb-2">
-                        <i class="fa-solid fa-sliders mr-3 text-cyan-500"></i> Cấu Hình Supabase & Bang Hội
+                        <i class="fa-solid fa-sliders mr-3 text-cyan-500"></i> Thiết Lập Bang Hội
                     </h2>
-                    <p class="text-sm text-slate-400">Kết nối trực tiếp dự án Supabase <span class="font-mono text-cyan-400">ijthpmzbwuoyxldhvmgo</span> của bạn và đổi tên danh xưng bang hội.</p>
+                    <p class="text-sm text-slate-400">Đổi tên và khẩu hiệu hiển thị của bang hội.</p>
                 </div>
-
                 <div class="bg-slate-900/80 p-8 rounded-2xl justice-border space-y-6 shadow-xl">
-                    <div class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">Supabase Project URL</label>
-                            <input type="text" id="setting-supabase-url" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none focus:border-cyan-500" value="https://ijthpmzbwuoyxldhvmgo.supabase.co">
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Tên Bang Hội</label>
+                            <input type="text" id="setting-guild-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500" value="Thủy Hàn Bang">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">Supabase Anon Key</label>
-                            <input type="password" id="setting-supabase-key" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none focus:border-cyan-500" placeholder="Nhập anon key...">
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-300 mb-2">Tên Bang Hội</label>
-                                <input type="text" id="setting-guild-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500" value="Thủy Hàn Bang">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-300 mb-2">Khẩu Hiệu</label>
-                                <input type="text" id="setting-guild-slogan" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500" value="Nghịch Thủy Hành Giả &bull; Giang Hồ Tương Phùng">
-                            </div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Khẩu Hiệu</label>
+                            <input type="text" id="setting-guild-slogan" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500" value="Nghịch Thủy Hành Giả • Giang Hồ Tương Phùng">
                         </div>
                     </div>
-                    <div class="flex justify-end space-x-4 pt-4 border-t border-slate-800">
-                        <button onclick="saveSupabaseAndGuildConfig()" class="bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 text-white font-medium px-6 py-2.5 rounded-xl shadow-lg transition flex items-center">
-                            <i class="fa-solid fa-plug mr-2"></i> Kết Nối & Lưu Cấu Hình
+                    <div class="flex justify-end pt-4 border-t border-slate-800">
+                        <button onclick="saveGuildConfig()" class="bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 text-white font-medium px-6 py-2.5 rounded-xl shadow-lg transition flex items-center">
+                            <i class="fa-solid fa-floppy-disk mr-2"></i> Lưu Thiết Lập
                         </button>
                     </div>
                 </div>
@@ -362,18 +246,16 @@
 
         </main>
 
-        <!-- Footer -->
         <footer class="bg-slate-950/90 border-t border-slate-900 py-6 mt-12 text-center text-xs text-slate-500">
-            <p>Nghịch Thủy Hàn &bull; Thủy Hàn Bang Hội Official &bull; Supabase Project: <span class="text-cyan-400 font-mono">ijthpmzbwuoyxldhvmgo</span></p>
+            <p>Nghịch Thủy Hàn &bull; Thủy Hàn Bang Hội Official</p>
         </footer>
-
     </div>
 
     <!-- MODALS -->
 
     <!-- Member Modal -->
     <div id="member-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
-        <div class="bg-slate-950 border border-cyan-500/50 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-6">
+        <div class="bg-slate-950 border border-cyan-500/50 w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-6 mx-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-4">
                 <h3 id="member-modal-title" class="cinzel-font text-xl font-bold text-cyan-400">Chiêu Mộ Hiệp Khách</h3>
                 <button onclick="closeModal('member-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -393,9 +275,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-300 mb-1">Môn Phái</label>
-                        <select id="member-faction" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                            <!-- Populated -->
-                        </select>
+                        <select id="member-faction" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500"></select>
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-slate-300 mb-1">Chức Vị</label>
@@ -405,16 +285,6 @@
                             <option value="vice_leader">Phó Bang Chủ</option>
                             <option value="leader">Bang Chủ</option>
                         </select>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Chiến Lực</label>
-                        <input type="number" id="member-power" min="0" value="15000" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Cống Hiến Tuần</label>
-                        <input type="number" id="member-contribution" min="0" step="0.01" value="0" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
                     </div>
                 </div>
                 <div>
@@ -437,49 +307,32 @@
         </div>
     </div>
 
-    <!-- Reward Modal -->
-    <div id="reward-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
-        <div class="bg-slate-950 border border-cyan-500/50 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-6">
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-slate-950 border border-cyan-500/50 w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-5 mx-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-                <h3 id="reward-modal-title" class="cinzel-font text-xl font-bold text-cyan-400">Thêm Báu Vật</h3>
-                <button onclick="closeModal('reward-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <h3 class="cinzel-font text-xl font-bold text-cyan-400">Bang Chủ Đăng Nhập</h3>
+                <button onclick="closeModal('login-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <form id="reward-form" onsubmit="handleRewardSubmit(event)" class="space-y-4">
-                <input type="hidden" id="reward-edit-id">
+            <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Tên Báu Vật *</label>
-                    <input type="text" id="reward-name" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" placeholder="VD: Giao Long Phục Ba - Tướng Thạch">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Trọng Số (Tỷ Lệ) *</label>
-                        <input type="number" id="reward-weight" min="0.01" step="0.01" value="10" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1">Số Lượng (Trống = Vô hạn)</label>
-                        <input type="number" id="reward-remaining" min="0" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" placeholder="VD: 20">
-                    </div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Email</label>
+                    <input type="email" id="login-email" required autocomplete="username" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1">Mô Tả</label>
-                    <textarea id="reward-desc" rows="2" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" placeholder="Mô tả báu vật..."></textarea>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Mật khẩu</label>
+                    <input type="password" id="login-password" required autocomplete="current-password" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
                 </div>
-                <div class="flex items-center space-x-2">
-                    <input type="checkbox" id="reward-active" checked class="w-4 h-4 rounded bg-slate-900 border-slate-800 text-cyan-600 focus:ring-cyan-500">
-                    <label for="reward-active" class="text-sm text-slate-300">Kích hoạt trong vòng quay</label>
-                </div>
-                <div class="flex justify-end space-x-3 pt-3 border-t border-slate-800">
-                    <button type="button" onclick="closeModal('reward-modal')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-sm font-medium">Hủy</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 text-white text-sm font-medium">Lưu Báu Vật</button>
-                </div>
+                <p id="login-error" class="text-xs text-red-400 hidden"></p>
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-500 text-white text-sm font-medium">Đăng Nhập</button>
             </form>
         </div>
     </div>
 
     <!-- Message Modal -->
-    <div id="message-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
-        <div class="bg-slate-950 border border-cyan-500/50 w-full max-w-sm rounded-2xl p-6 shadow-2xl text-center space-y-4">
-            <div id="msg-icon" class="w-16 h-16 rounded-full bg-cyan-500/20 text-cyan-400 mx-auto flex items-center justify-center text-2xl border border-cyan-500/40">
+    <div id="message-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-slate-950 border border-cyan-500/50 w-full max-w-sm rounded-2xl p-6 shadow-2xl text-center space-y-4 mx-4">
+            <div class="w-16 h-16 rounded-full bg-cyan-500/20 text-cyan-400 mx-auto flex items-center justify-center text-2xl border border-cyan-500/40">
                 <i class="fa-solid fa-bell"></i>
             </div>
             <h3 id="msg-title" class="cinzel-font text-lg font-bold text-cyan-400">Thông Báo Giang Hồ</h3>
@@ -488,81 +341,128 @@
         </div>
     </div>
 
-    <!-- Script Logic -->
     <script>
-        // Supabase configuration
-        let defaultUrl = localStorage.getItem('nth_supabase_url') || 'https://ijthpmzbwuoyxldhvmgo.supabase.co';
-        let defaultKey = localStorage.getItem('nth_supabase_key') || 'sb_publishable_vjrMTgdq1dWAGKLVwdhaqw_3pV0OJ_P';
-
-        document.getElementById('setting-supabase-url').value = defaultUrl;
-        document.getElementById('setting-supabase-key').value = defaultKey;
+        // ============ CẤU HÌNH ============
+        // Dán Project URL và key CÔNG KHAI (publishable / anon) của bạn vào đây.
+        // KHÔNG dán key secret / service_role.
+        const SUPABASE_URL = 'https://ijthpmzbwuoyxldhvmgo.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_vjrMTgdq1dWAGKLVwdhaqw_3pV0OJ_P';
+        // Email tài khoản Bang Chủ (đã tạo trong Supabase → Authentication → Users)
+        const OWNER_EMAIL = 'dtvu0601it@gmail.com';
+        // ==================================
 
         let supabaseClient = null;
+        let session = null;
 
-        function initSupabase(url, key) {
-            try {
-                if (window.supabase && url && key) {
-                    supabaseClient = window.supabase.createClient(url, key);
-                    updateConnectionStatus(true, 'Supabase Connected');
-                    return true;
-                }
-            } catch (e) {
-                console.error("Supabase init error:", e);
-            }
-            updateConnectionStatus(false, 'Offline / Cần check RLS');
-            return false;
-        }
+        const TAB_ON = "tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 bg-cyan-600/20 text-cyan-300 border border-cyan-500/40";
+        const TAB_OFF = "tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 text-slate-300 hover:bg-slate-900 hover:text-cyan-300";
+
+        const ROLE_LABEL = { leader: 'Bang Chủ', vice_leader: 'Phó Bang Chủ', elder: 'Trưởng Lão', member: 'Bang Chúng' };
+        const ROLE_RANK = { leader: 0, vice_leader: 1, elder: 2, member: 3 };
 
         let state = {
-            members: [],
-            factions: [],
-            rewards: [],
-            spinLogs: [],
-            guildSettings: { guild_name: 'Thủy Hàn Bang', slogan: 'Nghịch Thủy Hành Giả &bull; Giang Hồ Tương Phùng' },
+            members: [], factions: [], rewards: [], spinLogs: [],
             currentTab: 'members'
         };
+        let wheelRotation = 0;
+        let spinning = false;
+
+        function esc(s) {
+            return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function isAdmin() {
+            return !!session && (!OWNER_EMAIL || session.user.email === OWNER_EMAIL);
+        }
 
         function getCurrentWeekStart() {
             const d = new Date();
-            const day = d.getDay();
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-            const monday = new Date(d.setDate(diff));
-            return monday.toISOString().split('T')[0];
+            const diff = d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1);
+            const monday = new Date(d.getFullYear(), d.getMonth(), diff);
+            const mm = String(monday.getMonth() + 1).padStart(2, '0');
+            const dd = String(monday.getDate()).padStart(2, '0');
+            return `${monday.getFullYear()}-${mm}-${dd}`;
+        }
+
+        function updateConnectionStatus(ok, text) {
+            document.getElementById('status-dot').className = ok
+                ? "w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]"
+                : "w-2.5 h-2.5 rounded-full bg-amber-500";
+            document.getElementById('status-text').textContent = text;
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            initSupabase(defaultUrl, defaultKey);
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                const { data } = await supabaseClient.auth.getSession();
+                session = data.session;
+                supabaseClient.auth.onAuthStateChange((_event, s) => {
+                    session = s;
+                    applyAdminUI();
+                    renderMembersTable();
+                    renderLogsTable();
+                });
+            } catch (e) {
+                console.error('Supabase init error:', e);
+            }
+            applyAdminUI();
+            switchTab('members');
             await loadAllData();
-            setupWheelSelect();
         });
 
-        function updateConnectionStatus(success, text) {
-            const dot = document.getElementById('status-dot');
-            const txt = document.getElementById('status-text');
-            if (success) {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]";
-                txt.textContent = text;
+        // ============ ADMIN ============
+        function applyAdminUI() {
+            const admin = isAdmin();
+            document.getElementById('nav-settings').classList.toggle('hidden', !admin);
+            document.getElementById('mobile-nav-settings').classList.toggle('hidden', !admin);
+            const label = admin ? 'Đăng xuất' : 'Bang Chủ đăng nhập';
+            document.getElementById('admin-btn-text').textContent = label;
+            document.getElementById('mobile-admin-btn').textContent = label;
+            if (!admin && state.currentTab === 'settings') switchTab('members');
+        }
+
+        async function handleAdminClick() {
+            if (isAdmin()) {
+                await supabaseClient.auth.signOut();
+                showNotification('Đã đăng xuất', 'Bạn đang xem với tư cách khách.');
             } else {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
-                txt.textContent = text;
+                document.getElementById('login-error').classList.add('hidden');
+                openModal('login-modal');
             }
         }
 
+        async function handleLogin(e) {
+            e.preventDefault();
+            const errBox = document.getElementById('login-error');
+            errBox.classList.add('hidden');
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: document.getElementById('login-email').value.trim(),
+                    password: document.getElementById('login-password').value
+                });
+                if (error) throw error;
+                if (OWNER_EMAIL && data.user.email !== OWNER_EMAIL) {
+                    await supabaseClient.auth.signOut();
+                    throw new Error('Tài khoản này không phải Bang Chủ.');
+                }
+                document.getElementById('login-password').value = '';
+                closeModal('login-modal');
+                showNotification('Thành công', 'Đã đăng nhập Bang Chủ.');
+            } catch (err) {
+                errBox.textContent = err.message === 'Invalid login credentials' ? 'Sai email hoặc mật khẩu.' : err.message;
+                errBox.classList.remove('hidden');
+            }
+        }
+
+        // ============ TABS ============
         function switchTab(tabId) {
             state.currentTab = tabId;
-            const tabs = ['members', 'wheel', 'logs', 'rewards', 'settings'];
-            tabs.forEach(t => {
-                const content = document.getElementById(`tab-content-${t}`);
+            ['members', 'wheel', 'logs', 'settings'].forEach(t => {
+                document.getElementById(`tab-content-${t}`).classList.toggle('hidden', t !== tabId);
                 const btn = document.getElementById(`nav-${t}`);
-                if (t === tabId) {
-                    content.classList.remove('hidden');
-                    btn.className = "tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 bg-cyan-600/20 text-cyan-300 border border-cyan-500/40";
-                } else {
-                    content.classList.add('hidden');
-                    btn.className = "tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 text-slate-300 hover:bg-slate-900 hover:text-cyan-300";
-                }
+                const hidden = btn.classList.contains('hidden');
+                btn.className = (t === tabId ? TAB_ON : TAB_OFF) + (hidden ? ' hidden' : '');
             });
-
             if (tabId === 'wheel') {
                 drawWheelCanvas();
                 setupWheelSelect();
@@ -573,17 +473,17 @@
             document.getElementById('mobile-menu').classList.toggle('hidden');
         }
 
+        // ============ DATA ============
         async function loadAllData() {
             try {
-                if (!supabaseClient) throw new Error("No client");
+                if (!supabaseClient) throw new Error('Chưa khởi tạo Supabase');
 
-                // Factions
                 const { data: fData, error: fErr } = await supabaseClient.from('factions').select('*');
                 if (fErr) throw fErr;
                 state.factions = fData || [];
 
                 if (state.factions.length === 0) {
-                    const defaultFactions = [
+                    await supabaseClient.from('factions').insert([
                         { name: 'Thiết Y', description: 'Phòng thủ kiên cố, cận chiến uy mãnh' },
                         { name: 'Huyết Hà', description: 'Thương pháp bá đạo, sát thương bùng nổ' },
                         { name: 'Thần Tướng', description: 'Trường thương uy vũ, chiến lực toàn diện' },
@@ -591,66 +491,59 @@
                         { name: 'Cửu Linh', description: 'Triệu hồi dược linh, độc công vô hình' },
                         { name: 'Long Ngâm', description: 'Kiếm khí song hành, kiếm ý ngút trời' },
                         { name: 'Hặc Sát', description: 'Ám sát chớp nhoáng, bạo kích chí mạng' }
-                    ];
-                    await supabaseClient.from('factions').insert(defaultFactions);
+                    ]);
                     const { data: f2 } = await supabaseClient.from('factions').select('*');
                     state.factions = f2 || [];
                 }
 
-                // Members
                 const { data: mData, error: mErr } = await supabaseClient.from('members').select('*, factions(name)');
                 if (mErr) throw mErr;
                 state.members = mData || [];
 
-                // Rewards
                 const { data: rData, error: rErr } = await supabaseClient.from('rewards').select('*');
                 if (rErr) throw rErr;
                 state.rewards = rData || [];
 
                 if (state.rewards.length === 0) {
-                    const defaultRewards = [
+                    await supabaseClient.from('rewards').insert([
                         { name: 'Giao Long Phục Ba', weight: 3, remaining: 2, description: 'Trang sức tuyệt phẩm giang hồ', active: true },
                         { name: 'Tướng Thạch Cấp 3', weight: 10, remaining: 10, description: 'Đá cường hóa trang bị cao cấp', active: true },
                         { name: 'Vân Thêu Đồ', weight: 20, remaining: 25, description: 'Nguyên liệu chế tạo ngoại trang', active: true },
                         { name: 'Đồng Tiền Vàng x5000', weight: 67, remaining: null, description: 'Tiêu dao hành tẩu', active: true }
-                    ];
-                    await supabaseClient.from('rewards').insert(defaultRewards);
+                    ]);
                     const { data: r2 } = await supabaseClient.from('rewards').select('*');
                     state.rewards = r2 || [];
                 }
 
                 await loadSpinLogs();
 
-                // Settings
-                const { data: sData } = await supabaseClient.from('guild_settings').select('*').eq('id', true).single();
+                const { data: sData } = await supabaseClient.from('guild_settings').select('*').eq('id', true).maybeSingle();
                 if (sData) {
-                    state.guildSettings = sData;
                     document.getElementById('header-guild-name').textContent = sData.guild_name;
                     document.getElementById('header-guild-slogan').textContent = sData.slogan;
                     document.getElementById('setting-guild-name').value = sData.guild_name;
                     document.getElementById('setting-guild-slogan').value = sData.slogan;
                 }
 
+                updateConnectionStatus(true, 'Đã kết nối');
                 populateFactionDropdowns();
                 renderMembersTable();
-                renderRewardsTable();
-
+                if (state.currentTab === 'wheel') { drawWheelCanvas(); setupWheelSelect(); }
             } catch (err) {
-                console.warn("Supabase fetch notice (using mock fallback if RLS or network offline):", err);
+                console.warn('Không tải được dữ liệu Supabase, đang dùng dữ liệu mẫu:', err);
+                updateConnectionStatus(false, 'Lỗi kết nối - dữ liệu mẫu');
                 loadMockFallback();
             }
         }
 
         function loadMockFallback() {
             state.factions = [
-                { id: 1, name: 'Thiết Y' },
-                { id: 2, name: 'Huyết Hà' },
-                { id: 3, name: 'Tố Vấn' },
-                { id: 4, name: 'Long Ngâm' }
+                { id: 1, name: 'Thiết Y' }, { id: 2, name: 'Huyết Hà' },
+                { id: 3, name: 'Tố Vấn' }, { id: 4, name: 'Long Ngâm' }
             ];
             state.members = [
-                { id: '1', username: 'Vô Tình', game_id: 'NTH-01', faction_id: 1, factions: {name: 'Thiết Y'}, role: 'leader', power: 125000, weekly_contribution: 2400, status: 'active' },
-                { id: '2', username: 'Diệp Sương', game_id: 'NTH-02', faction_id: 3, factions: {name: 'Tố Vấn'}, role: 'elder', power: 112000, weekly_contribution: 1950, status: 'active' }
+                { id: '1', username: 'Vô Tình', game_id: 'NTH-01', faction_id: 1, factions: { name: 'Thiết Y' }, role: 'leader', status: 'active' },
+                { id: '2', username: 'Diệp Sương', game_id: 'NTH-02', faction_id: 3, factions: { name: 'Tố Vấn' }, role: 'elder', status: 'active' }
             ];
             state.rewards = [
                 { id: 'r1', name: 'Giao Long Phục Ba', weight: 5, remaining: 3, active: true },
@@ -660,81 +553,83 @@
             state.spinLogs = [];
             populateFactionDropdowns();
             renderMembersTable();
-            renderRewardsTable();
+            renderLogsTable();
         }
 
         function populateFactionDropdowns() {
-            const filterSel = document.getElementById('filter-faction');
-            const memberSel = document.getElementById('member-faction');
             let fOpts = '<option value="">Tất cả môn phái</option>';
             let mOpts = '<option value="">-- Chọn Môn Phái --</option>';
-
             state.factions.forEach(f => {
-                fOpts += `<option value="${f.id}">${f.name}</option>`;
-                mOpts += `<option value="${f.id}">${f.name}</option>`;
+                fOpts += `<option value="${f.id}">${esc(f.name)}</option>`;
+                mOpts += `<option value="${f.id}">${esc(f.name)}</option>`;
             });
+            const filterSel = document.getElementById('filter-faction');
+            const keep = filterSel.value;
             filterSel.innerHTML = fOpts;
-            memberSel.innerHTML = mOpts;
+            filterSel.value = keep;
+            document.getElementById('member-faction').innerHTML = mOpts;
         }
 
-        // Members
+        // ============ MEMBERS ============
+        function roleBadge(role) {
+            const label = ROLE_LABEL[role] || ROLE_LABEL.member;
+            const cls = role === 'leader' ? 'bg-cyan-950 text-cyan-300 border border-cyan-700/50'
+                : role === 'vice_leader' ? 'bg-blue-950 text-blue-300 border border-blue-700/50'
+                : role === 'elder' ? 'bg-slate-800 text-slate-300 border border-slate-700'
+                : 'bg-slate-900 text-slate-400';
+            return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold ${cls}">${label}</span>`;
+        }
+
         function renderMembersTable() {
             const tbody = document.getElementById('members-table-body');
             const search = document.getElementById('search-member').value.toLowerCase();
             const factionFilter = document.getElementById('filter-faction').value;
             const sortBy = document.getElementById('sort-members').value;
+            const admin = isAdmin();
 
-            let filtered = state.members.filter(m => {
+            const filtered = state.members.filter(m => {
                 const matchS = m.username.toLowerCase().includes(search) || (m.game_id && m.game_id.toLowerCase().includes(search));
                 const matchF = !factionFilter || String(m.faction_id) === String(factionFilter);
                 return matchS && matchF;
             });
 
             filtered.sort((a, b) => {
-                if (sortBy === 'power-desc') return b.power - a.power;
-                if (sortBy === 'contribution-desc') return b.weekly_contribution - a.weekly_contribution;
-                if (sortBy === 'name-asc') return a.username.localeCompare(b.username);
-                return 0;
+                if (sortBy === 'role') {
+                    const d = (ROLE_RANK[a.role] ?? 9) - (ROLE_RANK[b.role] ?? 9);
+                    return d !== 0 ? d : a.username.localeCompare(b.username);
+                }
+                return a.username.localeCompare(b.username);
             });
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-500">Không tìm thấy hiệp khách phù hợp.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-500">Không tìm thấy hiệp khách phù hợp.</td></tr>`;
                 return;
             }
 
-            let html = '';
-            filtered.forEach(m => {
-                const factionName = m.factions?.name || 'Vô Môn Phái';
-                let roleBadge = '';
-                if (m.role === 'leader') roleBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-950 text-cyan-300 border border-cyan-700/50">Bang Chủ</span>';
-                else if (m.role === 'vice_leader') roleBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-950 text-blue-300 border border-blue-700/50">Phó Bang</span>';
-                else if (m.role === 'elder') roleBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">Trưởng Lão</span>';
-                else roleBadge = '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-900 text-slate-400">Hiệp Khách</span>';
-
-                let statusBadge = m.status === 'active' ? '<span class="text-cyan-400 font-medium">Hoạt động</span>' : '<span class="text-slate-500">Nghỉ</span>';
-
-                html += `
+            tbody.innerHTML = filtered.map(m => {
+                const statusBadge = m.status === 'active'
+                    ? '<span class="text-cyan-400 font-medium">Hoạt động</span>'
+                    : m.status === 'banned' ? '<span class="text-red-400">Trục xuất</span>'
+                    : '<span class="text-slate-500">Nghỉ</span>';
+                const del = admin
+                    ? `<button onclick="deleteMember('${esc(m.id)}')" title="Xóa" class="text-slate-400 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>`
+                    : '';
+                return `
                     <tr class="hover:bg-slate-900/50 transition">
                         <td class="p-4">
-                            <div class="font-bold text-white">${m.username}</div>
-                            <div class="text-xs text-slate-400 font-mono">ID: ${m.game_id || 'N/A'}</div>
+                            <div class="font-bold text-white">${esc(m.username)}</div>
+                            <div class="text-xs text-slate-400 font-mono">ID: ${esc(m.game_id || 'N/A')}</div>
                         </td>
-                        <td class="p-4 text-slate-300">${factionName}</td>
-                        <td class="p-4">${roleBadge}</td>
-                        <td class="p-4 text-right font-mono text-cyan-400 font-semibold">${Number(m.power).toLocaleString()}</td>
-                        <td class="p-4 text-right font-mono text-emerald-400">${Number(m.weekly_contribution).toLocaleString()}</td>
+                        <td class="p-4 text-slate-300">${esc(m.factions?.name || 'Vô Môn Phái')}</td>
+                        <td class="p-4">${roleBadge(m.role)}</td>
                         <td class="p-4 text-center text-xs">${statusBadge}</td>
                         <td class="p-4 text-center space-x-2">
-                            <button onclick="openEditMemberModal('${m.id}')" class="text-slate-400 hover:text-cyan-400 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="deleteMember('${m.id}')" class="text-slate-400 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="openEditMemberModal('${esc(m.id)}')" title="Sửa" class="text-slate-400 hover:text-cyan-400 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                            ${del}
                         </td>
-                    </tr>
-                `;
-            });
-            tbody.innerHTML = html;
+                    </tr>`;
+            }).join('');
         }
-
-        function filterMembers() { renderMembersTable(); }
 
         function openAddMemberModal() {
             document.getElementById('member-modal-title').textContent = 'Chiêu Mộ Hiệp Khách';
@@ -752,8 +647,6 @@
             document.getElementById('member-game-id').value = m.game_id || '';
             document.getElementById('member-faction').value = m.faction_id || '';
             document.getElementById('member-role').value = m.role || 'member';
-            document.getElementById('member-power').value = m.power || 0;
-            document.getElementById('member-contribution').value = m.weekly_contribution || 0;
             document.getElementById('member-status').value = m.status || 'active';
             document.getElementById('member-notes').value = m.notes || '';
             openModal('member-modal');
@@ -762,36 +655,23 @@
         async function handleMemberSubmit(e) {
             e.preventDefault();
             const editId = document.getElementById('member-edit-id').value;
+            const factionVal = document.getElementById('member-faction').value;
             const payload = {
-                username: document.getElementById('member-username').value,
-                game_id: document.getElementById('member-game-id').value || null,
-                faction_id: document.getElementById('member-faction').value ? Number(document.getElementById('member-faction').value) : null,
+                username: document.getElementById('member-username').value.trim(),
+                game_id: document.getElementById('member-game-id').value.trim() || null,
+                faction_id: factionVal ? Number(factionVal) : null,
                 role: document.getElementById('member-role').value,
-                power: Number(document.getElementById('member-power').value),
-                weekly_contribution: Number(document.getElementById('member-contribution').value),
                 status: document.getElementById('member-status').value,
                 notes: document.getElementById('member-notes').value
             };
 
             try {
-                if (supabaseClient) {
-                    if (editId) {
-                        const { error } = await supabaseClient.from('members').update(payload).eq('id', editId);
-                        if (error) throw error;
-                    } else {
-                        const { error } = await supabaseClient.from('members').insert([payload]);
-                        if (error) throw error;
-                    }
-                    await loadAllData();
-                } else {
-                    if (editId) {
-                        const idx = state.members.findIndex(x => String(x.id) === String(editId));
-                        if (idx !== -1) state.members[idx] = { ...state.members[idx], ...payload };
-                    } else {
-                        state.members.push({ id: Date.now().toString(), ...payload, factions: state.factions.find(f => f.id == payload.faction_id) });
-                    }
-                    renderMembersTable();
-                }
+                if (!supabaseClient) throw new Error('Chưa kết nối Supabase.');
+                const { error } = editId
+                    ? await supabaseClient.from('members').update(payload).eq('id', editId)
+                    : await supabaseClient.from('members').insert([payload]);
+                if (error) throw error;
+                await loadAllData();
                 closeModal('member-modal');
                 showNotification('Thành công', 'Đã lưu thông tin hiệp khách.');
             } catch (err) {
@@ -800,28 +680,29 @@
         }
 
         async function deleteMember(id) {
+            if (!isAdmin()) return showNotification('Không có quyền', 'Chỉ Bang Chủ mới được xóa.');
             if (!confirm('Xóa hiệp khách này khỏi bang?')) return;
             try {
-                if (supabaseClient) {
-                    const { error } = await supabaseClient.from('members').delete().eq('id', id);
-                    if (error) throw error;
-                    await loadAllData();
-                } else {
-                    state.members = state.members.filter(m => String(m.id) !== String(id));
-                    renderMembersTable();
-                }
+                const { data, error } = await supabaseClient.from('members').delete().eq('id', id).select();
+                if (error) throw error;
+                if (!data || data.length === 0) throw new Error('Không xóa được. Bạn không có quyền hoặc bản ghi không tồn tại.');
+                await loadAllData();
                 showNotification('Thành công', 'Đã xóa hiệp khách.');
             } catch (err) {
                 showNotification('Lỗi', err.message);
             }
         }
 
-        // Wheel
+        // ============ WHEEL ============
+        function activeRewards() {
+            return state.rewards.filter(r => r.active && (r.remaining === null || r.remaining > 0));
+        }
+
         function setupWheelSelect() {
             const sel = document.getElementById('wheel-member-select');
             let opts = '<option value="">-- Chọn hiệp khách --</option>';
             state.members.filter(m => m.status === 'active').forEach(m => {
-                opts += `<option value="${m.id}">${m.username} (${m.factions?.name || 'Vô phái'})</option>`;
+                opts += `<option value="${esc(m.id)}">${esc(m.username)} (${esc(m.factions?.name || 'Vô phái')})</option>`;
             });
             sel.innerHTML = opts;
             sel.onchange = handleWheelMemberChange;
@@ -833,67 +714,63 @@
             const memberId = e.target.value;
             const spinBtn = document.getElementById('spin-btn');
             const statusBox = document.getElementById('wheel-member-status-box');
-            
+
             if (!memberId) {
                 spinBtn.disabled = true;
                 statusBox.classList.add('hidden');
                 return;
             }
-
             const m = state.members.find(x => String(x.id) === String(memberId));
-            if (m) {
-                document.getElementById('w-status-faction').textContent = m.factions?.name || 'Vô Môn Phái';
-                document.getElementById('w-status-role').textContent = m.role;
-                
-                const weekStart = getCurrentWeekStart();
-                const alreadySpun = state.spinLogs.some(l => String(l.member_id) === String(memberId) && l.week_start === weekStart);
+            if (!m) return;
 
-                if (alreadySpun) {
-                    document.getElementById('w-status-spun').textContent = 'Đã quay tuần này rồi!';
-                    document.getElementById('w-status-spun').className = 'font-medium text-red-400';
-                    spinBtn.disabled = true;
-                } else {
-                    document.getElementById('w-status-spun').textContent = 'Chưa quay - Sẵn sàng!';
-                    document.getElementById('w-status-spun').className = 'font-medium text-cyan-400';
-                    spinBtn.disabled = false;
-                }
-                statusBox.classList.remove('hidden');
+            document.getElementById('w-status-faction').textContent = m.factions?.name || 'Vô Môn Phái';
+            document.getElementById('w-status-role').textContent = ROLE_LABEL[m.role] || ROLE_LABEL.member;
+
+            const weekStart = getCurrentWeekStart();
+            const alreadySpun = state.spinLogs.some(l => String(l.member_id) === String(memberId) && l.week_start === weekStart);
+            const spunEl = document.getElementById('w-status-spun');
+            if (alreadySpun) {
+                spunEl.textContent = 'Đã quay tuần này rồi!';
+                spunEl.className = 'font-medium text-red-400';
+                spinBtn.disabled = true;
+            } else {
+                spunEl.textContent = 'Chưa quay - Sẵn sàng!';
+                spunEl.className = 'font-medium text-cyan-400';
+                spinBtn.disabled = spinning;
             }
+            statusBox.classList.remove('hidden');
         }
 
         function drawWheelCanvas() {
             const canvas = document.getElementById('wheel-canvas');
             const ctx = canvas.getContext('2d');
-            const activeRewards = state.rewards.filter(r => r.active && (r.remaining === null || r.remaining > 0));
-            
+            const rewards = activeRewards();
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
+            const cx = canvas.width / 2, cy = canvas.height / 2;
             const radius = canvas.width / 2 - 10;
 
-            if (activeRewards.length === 0) {
+            if (rewards.length === 0) {
                 ctx.fillStyle = '#131c2e';
                 ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
                 ctx.fill();
                 ctx.fillStyle = '#06b6d4';
                 ctx.font = '16px Inter';
                 ctx.textAlign = 'center';
-                ctx.fillText('Kho báu vật đã hết!', centerX, centerY);
+                ctx.fillText('Kho báu vật đã hết!', cx, cy);
                 return;
             }
 
-            const totalWeight = activeRewards.reduce((sum, r) => sum + Number(r.weight), 0);
-            let startAngle = 0;
+            const totalWeight = rewards.reduce((s, r) => s + Number(r.weight), 0);
+            let start = 0;
             const colors = ['#0369a1', '#0e7490', '#155e75', '#164e63', '#0891b2', '#0284c7'];
 
-            activeRewards.forEach((r, i) => {
-                const sliceAngle = (Number(r.weight) / totalWeight) * 2 * Math.PI;
-                const endAngle = startAngle + sliceAngle;
-
+            rewards.forEach((r, i) => {
+                const slice = (Number(r.weight) / totalWeight) * 2 * Math.PI;
                 ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, radius, start, start + slice);
                 ctx.closePath();
                 ctx.fillStyle = colors[i % colors.length];
                 ctx.fill();
@@ -902,91 +779,86 @@
                 ctx.stroke();
 
                 ctx.save();
-                ctx.translate(centerX, centerY);
-                ctx.rotate(startAngle + sliceAngle / 2);
+                ctx.translate(cx, cy);
+                ctx.rotate(start + slice / 2);
                 ctx.textAlign = 'right';
                 ctx.fillStyle = '#ffffff';
                 ctx.font = 'bold 12px Inter';
                 ctx.fillText(r.name.length > 14 ? r.name.substring(0, 12) + '...' : r.name, radius - 25, 5);
                 ctx.restore();
 
-                startAngle = endAngle;
+                start += slice;
             });
         }
 
         async function spinWheel() {
+            if (spinning) return;
             const memberId = document.getElementById('wheel-member-select').value;
             if (!memberId) return;
 
-            const activeRewards = state.rewards.filter(r => r.active && (r.remaining === null || r.remaining > 0));
-            if (activeRewards.length === 0) {
-                showNotification('Thông báo', 'Kho báu vật đã hết phần thưởng!');
-                return;
-            }
-
-            const totalWeight = activeRewards.reduce((sum, r) => sum + Number(r.weight), 0);
-            let randomNum = Math.random() * totalWeight;
-            let selectedReward = activeRewards[0];
-
-            for (const r of activeRewards) {
-                if (randomNum < Number(r.weight)) {
-                    selectedReward = r;
-                    break;
-                }
-                randomNum -= Number(r.weight);
-            }
+            const rewards = activeRewards();
+            if (rewards.length === 0) return showNotification('Thông báo', 'Kho báu vật đã hết phần thưởng!');
 
             const member = state.members.find(m => String(m.id) === String(memberId));
             const weekStart = getCurrentWeekStart();
+            if (state.spinLogs.some(l => String(l.member_id) === String(memberId) && l.week_start === weekStart)) {
+                return showNotification('Thông báo', 'Hiệp khách này đã quay tuần này rồi.');
+            }
 
-            const canvas = document.getElementById('wheel-canvas');
-            const randomRotation = 1800 + Math.random() * 720;
-            canvas.style.transform = `rotate(${randomRotation}deg)`;
+            // Chọn phần thưởng theo trọng số
+            const totalWeight = rewards.reduce((s, r) => s + Number(r.weight), 0);
+            let rnd = Math.random() * totalWeight;
+            let selected = rewards[rewards.length - 1];
+            let before = 0;
+            for (const r of rewards) {
+                if (rnd < Number(r.weight)) { selected = r; break; }
+                rnd -= Number(r.weight);
+                before += Number(r.weight);
+            }
+
+            // Tính góc để kim (ở trên cùng) dừng đúng ô trúng thưởng
+            const sliceStart = (before / totalWeight) * 360;
+            const sliceSize = (Number(selected.weight) / totalWeight) * 360;
+            const target = sliceStart + sliceSize * (0.15 + Math.random() * 0.7);
+            const desired = ((270 - target) % 360 + 360) % 360;
+            const current = ((wheelRotation % 360) + 360) % 360;
+            wheelRotation += 360 * 5 + ((desired - current) % 360 + 360) % 360;
+
+            spinning = true;
+            document.getElementById('spin-btn').disabled = true;
+            document.getElementById('spin-result-box').classList.add('hidden');
+            document.getElementById('wheel-canvas').style.transform = `rotate(${wheelRotation}deg)`;
 
             setTimeout(async () => {
                 try {
                     const logPayload = {
                         member_id: member.id,
-                        reward_id: selectedReward.id,
+                        reward_id: selected.id,
                         member_name: member.username,
-                        reward_name: selectedReward.name,
+                        reward_name: selected.name,
                         week_start: weekStart,
                         claimed: false
                     };
+                    const { error: logErr } = await supabaseClient.from('spin_logs').insert([logPayload]);
+                    if (logErr) throw logErr;
 
-                    if (supabaseClient) {
-                        const { error: logErr } = await supabaseClient.from('spin_logs').insert([logPayload]);
-                        if (logErr) throw logErr;
-
-                        if (selectedReward.remaining !== null && selectedReward.remaining > 0) {
-                            const newRemaining = selectedReward.remaining - 1;
-                            await supabaseClient.from('rewards').update({ remaining: newRemaining }).eq('id', selectedReward.id);
-                        }
-
-                        await loadAllData();
-                    } else {
-                        state.spinLogs.unshift({ id: Date.now(), ...logPayload, spun_at: new Date().toISOString() });
-                        if (selectedReward.remaining !== null && selectedReward.remaining > 0) {
-                            selectedReward.remaining -= 1;
-                        }
+                    if (selected.remaining !== null && selected.remaining > 0) {
+                        await supabaseClient.from('rewards').update({ remaining: selected.remaining - 1 }).eq('id', selected.id);
                     }
 
-                    const resBox = document.getElementById('spin-result-box');
-                    const resText = document.getElementById('spin-result-text');
-                    resText.textContent = `${member.username} đã nhận được: ${selectedReward.name}!`;
-                    resBox.classList.remove('hidden');
-
-                    setupWheelSelect();
-                    renderRewardsTable();
-                    loadSpinLogs();
-
+                    document.getElementById('spin-result-text').textContent = `${member.username} đã nhận được: ${selected.name}!`;
+                    document.getElementById('spin-result-box').classList.remove('hidden');
+                    await loadAllData();
                 } catch (err) {
                     showNotification('Lỗi', err.message);
+                } finally {
+                    spinning = false;
+                    setupWheelSelect();
                 }
-            }, 4000);
+            }, 4200);
         }
 
-        // Logs
+        // ============ LOGS ============
         async function loadSpinLogs() {
             try {
                 if (supabaseClient) {
@@ -994,53 +866,50 @@
                     if (error) throw error;
                     state.spinLogs = data || [];
                 }
-                renderLogsTable();
             } catch (err) {
-                renderLogsTable();
+                console.warn('Không tải được sổ ban thưởng:', err);
             }
+            renderLogsTable();
         }
 
         function renderLogsTable() {
             const tbody = document.getElementById('logs-table-body');
+            const admin = isAdmin();
             if (state.spinLogs.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500">Chưa có lịch sử quay thưởng nào.</td></tr>`;
                 return;
             }
 
-            let html = '';
-            state.spinLogs.forEach(l => {
+            tbody.innerHTML = state.spinLogs.map(l => {
                 const dateStr = new Date(l.spun_at || Date.now()).toLocaleString('vi-VN');
-                const claimedBadge = l.claimed 
-                    ? '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-950 text-cyan-300 border border-cyan-800">Đã trao</span>'
-                    : `<button onclick="toggleClaimLog('${l.id}', true)" class="px-3 py-1 rounded-lg text-xs font-semibold bg-cyan-600 hover:bg-cyan-500 text-white transition">Xác nhận trao</button>`;
+                let claimed;
+                if (l.claimed) claimed = '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-950 text-cyan-300 border border-cyan-800">Đã trao</span>';
+                else if (admin) claimed = `<button onclick="toggleClaimLog('${esc(l.id)}', true)" class="px-3 py-1 rounded-lg text-xs font-semibold bg-cyan-600 hover:bg-cyan-500 text-white transition">Xác nhận trao</button>`;
+                else claimed = '<span class="text-xs text-slate-500">Chờ trao</span>';
+                const del = admin
+                    ? `<button onclick="deleteLog('${esc(l.id)}')" title="Xóa" class="text-slate-400 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>`
+                    : '<span class="text-slate-700">-</span>';
 
-                html += `
+                return `
                     <tr class="hover:bg-slate-900/50 transition">
-                        <td class="p-4 font-mono text-slate-400">${l.week_start}</td>
-                        <td class="p-4 font-bold text-white">${l.member_name}</td>
-                        <td class="p-4 text-cyan-400 font-medium">${l.reward_name}</td>
+                        <td class="p-4 font-mono text-slate-400">${esc(l.week_start)}</td>
+                        <td class="p-4 font-bold text-white">${esc(l.member_name)}</td>
+                        <td class="p-4 text-cyan-400 font-medium">${esc(l.reward_name)}</td>
                         <td class="p-4 text-slate-400 text-xs">${dateStr}</td>
-                        <td class="p-4 text-center">${claimedBadge}</td>
-                        <td class="p-4 text-center">
-                            <button onclick="deleteLog('${l.id}')" class="text-slate-400 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-            tbody.innerHTML = html;
+                        <td class="p-4 text-center">${claimed}</td>
+                        <td class="p-4 text-center">${del}</td>
+                    </tr>`;
+            }).join('');
         }
 
         async function toggleClaimLog(id, claimed) {
+            if (!isAdmin()) return showNotification('Không có quyền', 'Chỉ Bang Chủ mới được xác nhận trao thưởng.');
             try {
-                const claimedAt = claimed ? new Date().toISOString() : null;
-                if (supabaseClient) {
-                    await supabaseClient.from('spin_logs').update({ claimed, claimed_at: claimedAt }).eq('id', id);
-                    await loadSpinLogs();
-                } else {
-                    const log = state.spinLogs.find(x => String(x.id) === String(id));
-                    if (log) { log.claimed = claimed; log.claimed_at = claimedAt; }
-                    renderLogsTable();
-                }
+                const { data, error } = await supabaseClient.from('spin_logs')
+                    .update({ claimed, claimed_at: claimed ? new Date().toISOString() : null }).eq('id', id).select();
+                if (error) throw error;
+                if (!data || data.length === 0) throw new Error('Không cập nhật được. Bạn không có quyền.');
+                await loadSpinLogs();
                 showNotification('Thành công', 'Đã cập nhật trạng thái trao thưởng.');
             } catch (err) {
                 showNotification('Lỗi', err.message);
@@ -1048,142 +917,36 @@
         }
 
         async function deleteLog(id) {
+            if (!isAdmin()) return showNotification('Không có quyền', 'Chỉ Bang Chủ mới được xóa.');
             if (!confirm('Xóa bản ghi lịch sử này?')) return;
             try {
-                if (supabaseClient) {
-                    await supabaseClient.from('spin_logs').delete().eq('id', id);
-                    await loadSpinLogs();
-                } else {
-                    state.spinLogs = state.spinLogs.filter(l => String(l.id) !== String(id));
-                    renderLogsTable();
-                }
-            } catch(e) {}
-        }
-
-        // Rewards
-        function renderRewardsTable() {
-            const tbody = document.getElementById('rewards-table-body');
-            if (state.rewards.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500">Kho báu vật trống.</td></tr>`;
-                return;
-            }
-
-            let html = '';
-            state.rewards.forEach(r => {
-                const activeBadge = r.active ? '<span class="text-cyan-400 font-medium">Hoạt động</span>' : '<span class="text-slate-500">Tạm ẩn</span>';
-                const remainingStr = r.remaining === null ? 'Vô hạn' : r.remaining;
-
-                html += `
-                    <tr class="hover:bg-slate-900/50 transition">
-                        <td class="p-4 font-bold text-white">${r.name}</td>
-                        <td class="p-4 text-slate-400 text-xs">${r.description || '-'}</td>
-                        <td class="p-4 text-right font-mono text-cyan-400">${r.weight}</td>
-                        <td class="p-4 text-right font-mono text-blue-400">${remainingStr}</td>
-                        <td class="p-4 text-center text-xs">${activeBadge}</td>
-                        <td class="p-4 text-center space-x-2">
-                            <button onclick="openEditRewardModal('${r.id}')" class="text-slate-400 hover:text-cyan-400 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="deleteReward('${r.id}')" class="text-slate-400 hover:text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-            tbody.innerHTML = html;
-        }
-
-        function openAddRewardModal() {
-            document.getElementById('reward-modal-title').textContent = 'Thêm Báu Vật';
-            document.getElementById('reward-edit-id').value = '';
-            document.getElementById('reward-form').reset();
-            openModal('reward-modal');
-        }
-
-        function openEditRewardModal(id) {
-            const r = state.rewards.find(x => String(x.id) === String(id));
-            if (!r) return;
-            document.getElementById('reward-modal-title').textContent = 'Sửa Báu Vật';
-            document.getElementById('reward-edit-id').value = r.id;
-            document.getElementById('reward-name').value = r.name;
-            document.getElementById('reward-weight').value = r.weight;
-            document.getElementById('reward-remaining').value = r.remaining !== null ? r.remaining : '';
-            document.getElementById('reward-desc').value = r.description || '';
-            document.getElementById('reward-active').checked = r.active;
-            openModal('reward-modal');
-        }
-
-        async function handleRewardSubmit(e) {
-            e.preventDefault();
-            const editId = document.getElementById('reward-edit-id').value;
-            const remVal = document.getElementById('reward-remaining').value;
-            const payload = {
-                name: document.getElementById('reward-name').value,
-                weight: Number(document.getElementById('reward-weight').value),
-                remaining: remVal === '' ? null : Number(remVal),
-                description: document.getElementById('reward-desc').value,
-                active: document.getElementById('reward-active').checked
-            };
-
-            try {
-                if (supabaseClient) {
-                    if (editId) {
-                        await supabaseClient.from('rewards').update(payload).eq('id', editId);
-                    } else {
-                        await supabaseClient.from('rewards').insert([payload]);
-                    }
-                    await loadAllData();
-                } else {
-                    if (editId) {
-                        const idx = state.rewards.findIndex(x => String(x.id) === String(editId));
-                        if (idx !== -1) state.rewards[idx] = { ...state.rewards[idx], ...payload };
-                    } else {
-                        state.rewards.push({ id: Date.now().toString(), ...payload });
-                    }
-                    renderRewardsTable();
-                }
-                closeModal('reward-modal');
-                showNotification('Thành công', 'Đã lưu báu vật.');
+                const { data, error } = await supabaseClient.from('spin_logs').delete().eq('id', id).select();
+                if (error) throw error;
+                if (!data || data.length === 0) throw new Error('Không xóa được. Bạn không có quyền hoặc bản ghi không tồn tại.');
+                await loadSpinLogs();
             } catch (err) {
                 showNotification('Lỗi', err.message);
             }
         }
 
-        async function deleteReward(id) {
-            if (!confirm('Xóa báu vật này?')) return;
-            try {
-                if (supabaseClient) {
-                    await supabaseClient.from('rewards').delete().eq('id', id);
-                    await loadAllData();
-                } else {
-                    state.rewards = state.rewards.filter(r => String(r.id) !== String(id));
-                    renderRewardsTable();
-                }
-            } catch(e) {}
-        }
-
-        // Settings Supabase & Guild
-        async function saveSupabaseAndGuildConfig() {
-            const url = document.getElementById('setting-supabase-url').value.trim();
-            const key = document.getElementById('setting-supabase-key').value.trim();
+        // ============ SETTINGS (chỉ Bang Chủ) ============
+        async function saveGuildConfig() {
+            if (!isAdmin()) return showNotification('Không có quyền', 'Chỉ Bang Chủ mới được đổi thiết lập.');
             const guild_name = document.getElementById('setting-guild-name').value.trim();
             const slogan = document.getElementById('setting-guild-slogan').value.trim();
-
-            localStorage.setItem('nth_supabase_url', url);
-            localStorage.setItem('nth_supabase_key', key);
-
-            initSupabase(url, key);
-
             try {
-                if (supabaseClient) {
-                    await supabaseClient.from('guild_settings').upsert({ id: true, guild_name, slogan, updated_at: new Date().toISOString() });
-                }
+                const { error } = await supabaseClient.from('guild_settings')
+                    .upsert({ id: true, guild_name, slogan, updated_at: new Date().toISOString() });
+                if (error) throw error;
                 document.getElementById('header-guild-name').textContent = guild_name;
                 document.getElementById('header-guild-slogan').textContent = slogan;
-                showNotification('Thành công', 'Đã kết nối Supabase và lưu cấu hình bang hội.');
-                await loadAllData();
+                showNotification('Thành công', 'Đã lưu thiết lập bang hội.');
             } catch (err) {
-                showNotification('Lưu ý', 'Đã lưu cấu hình kết nối. Hãy đảm bảo bạn đã tạo bảng trên Supabase.');
+                showNotification('Lỗi', err.message);
             }
         }
 
+        // ============ MODAL ============
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         function showNotification(title, body) {
@@ -1194,5 +957,3 @@
     </script>
 </body>
 </html>
-```
-eof
